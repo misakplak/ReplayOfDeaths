@@ -1,0 +1,26 @@
+name: DeathLogging
+description: $description
+version: '${version}'
+
+main: misakplak.deathLogging.DeathLogging
+api-version: '1.21.11'
+load: POSTWORLD
+
+authors: [ misakplak ]
+
+depend:
+  - packetevents
+
+
+commands:
+
+  replay:
+    description: the best replay command :D
+    usage: /replay <player>
+    permission: replay.view
+
+permissions:
+  replay.view:
+    description: a perm for /replay command
+    default: op
+

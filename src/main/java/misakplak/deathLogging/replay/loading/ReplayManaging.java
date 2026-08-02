@@ -1,0 +1,67 @@
+package misakplak.deathLogging.replay.loading;
+
+import misakplak.deathLogging.database.ReplayStorage;
+import misakplak.deathLogging.replay.Replay;
+import misakplak.deathLogging.replay.world.PlotCopier;
+import misakplak.deathLogging.replay.world.ReplayWorldManager;
+import org.bukkit.Location;
+import org.bukkit.entity.Player;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+
+public class ReplayManaging {
+
+    private final Map<UUID, ReplaySession> sessions = new HashMap<>();
+    private final ReplayStorage storage;
+
+    private final ReplayWorldManager replayWorldManager;
+    private final PlotCopier plotCopier;
+
+    public ReplayManaging(ReplayStorage storage, ReplayWorldManager replayWorldManager){
+        this.storage = storage;
+        this.replayWorldManager = replayWorldManager;
+        this.plotCopier = new PlotCopier();
+    }
+
+    public void play(Player player, UUID replayId){
+
+        stop(player);
+
+        Replay replay = storage.load(replayId);
+
+        if (replay == null) {
+            player.sendMessage("§c§l§nReplay not found!");
+            return;
+        }
+
+// Allocate a plot
+        Location plot = replayWorldManager
+                .getPlotManager()
+                .getPlot(replayWorldManager.getWorld(), replay.getReplayId());
+
+// Copy terrain
+        plotCopier.copy(replay.getDeathlocation(), plot);
+
+//  create session
+        ReplaySession session = new ReplaySession(player, replay, plot);
+
+        sessions.put(player.getUniqueId(), session);
+        session.start();
+    }
+
+    public void stop(Player player){
+
+        ReplaySession session = sessions.remove(player.getUniqueId());
+
+        if(session != null){
+            session.stop();
+        }
+
+    }
+
+    public boolean isWatching(Player player){
+        return sessions.containsKey(player.getUniqueId());
+    }
+}
