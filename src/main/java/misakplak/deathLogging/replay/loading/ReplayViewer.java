@@ -32,6 +32,7 @@ public class ReplayViewer {
 
     private final double offsetX;
     private final double offsetZ;
+    private final double offsetY;
 
 
     private ReplayNPC npc;
@@ -48,6 +49,7 @@ public class ReplayViewer {
 
         this.offsetX = plotOrigin.getX() - replay.getDeathlocation().getX();
         this.offsetZ = plotOrigin.getZ() - replay.getDeathlocation().getZ();
+        this.offsetY = plotOrigin.getY() - replay.getDeathlocation().getY();
     }
 
     public void spawn() {
@@ -65,7 +67,7 @@ public class ReplayViewer {
 
         spawn.add(
                 plotOrigin.getX() - replay.getDeathlocation().getX(),
-                0,
+                plotOrigin.getY() - replay.getDeathlocation().getY(),
                 plotOrigin.getZ() - replay.getDeathlocation().getZ()
         );
 
@@ -160,7 +162,7 @@ public class ReplayViewer {
 
         Location location = Position.toLocation(position, plotOrigin.getWorld());
 
-        location.add(offsetX, 0, offsetZ);
+        location.add(offsetX, offsetY, offsetZ);
 
         return location;
     }

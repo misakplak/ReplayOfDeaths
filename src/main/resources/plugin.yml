@@ -8,9 +8,6 @@ load: POSTWORLD
 
 authors: [ misakplak ]
 
-depend:
-  - packetevents
-
 
 commands:
 

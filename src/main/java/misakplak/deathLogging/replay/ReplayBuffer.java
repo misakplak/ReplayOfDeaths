@@ -22,7 +22,6 @@ public class ReplayBuffer {
         long oldestAllowedTick = record.tick() - 300;
 
         while (!records.isEmpty() && records.getFirst().tick() < oldestAllowedTick) {
-            Bukkit.getLogger().info("removing " + records.getFirst().tick());
             records.removeFirst();
         }
     }

@@ -13,34 +13,25 @@ public class PlotCopier {
         World source = sourceCenter.getWorld();
         World plot = plotOrigin.getWorld();
 
+        int yOffset = plotOrigin.getBlockY() - sourceCenter.getBlockY();
+
         for (int x = -RADIUS; x <= RADIUS; x++) {
             for (int z = -RADIUS; z <= RADIUS; z++) {
-
                 for (int y = source.getMinHeight(); y < source.getMaxHeight(); y++) {
                     Block sourceBlock = source.getBlockAt(
-                            sourceCenter.getBlockX() + x,
-                            y,
-                            sourceCenter.getBlockZ() + z
-                    );
+                            sourceCenter.getBlockX() + x, y, sourceCenter.getBlockZ() + z);
 
-                    if (sourceBlock.isEmpty()) {
-                        continue;
-                    }
+                    if (sourceBlock.isEmpty()) continue;
+
+                    int targetY = y + yOffset;
+                    if (targetY < plot.getMinHeight() || targetY >= plot.getMaxHeight()) continue;
 
                     Block targetBlock = plot.getBlockAt(
-                            plotOrigin.getBlockX() + x,
-                            y,
-                            plotOrigin.getBlockZ() + z
-                    );
-
-
+                            plotOrigin.getBlockX() + x, targetY, plotOrigin.getBlockZ() + z);
 
                     targetBlock.setBlockData(sourceBlock.getBlockData(), false);
                 }
-
             }
         }
-
-
     }
 }

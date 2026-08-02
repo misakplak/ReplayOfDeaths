@@ -42,9 +42,6 @@ public class ReplayTask extends BukkitRunnable {
 
                 EntityRecorder recorder = new EntityRecorder();
                 recorder.record(player,buffer);
-                // Spawn?
-                // Move?
-                // Metadata changed?
             }
         }
 

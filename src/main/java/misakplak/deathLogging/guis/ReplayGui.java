@@ -59,7 +59,7 @@ public class ReplayGui implements Listener {
             case GREEN_DYE -> {
 
                 ReplayStorage replayStorage = new ReplayStorage(DeathLogging.getInstance().getMongoManager().getDatabase());
-                ReplayWorldManager replayWorldManager = new ReplayWorldManager();
+                ReplayWorldManager replayWorldManager = DeathLogging.getInstance().getReplayWorldManager();
                 ReplayManaging replayManaging = new ReplayManaging(replayStorage, replayWorldManager);
 
                 Replay replay = replayStorage.loadLatest();

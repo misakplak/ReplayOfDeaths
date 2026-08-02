@@ -5,13 +5,17 @@ import com.mojang.datafixers.util.Pair;
 import misakplak.deathLogging.misc.SwingHand;
 import misakplak.deathLogging.recordables.Position;
 import net.minecraft.advancements.criterion.InventoryChangeTrigger;
+import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.PacketFlow;
 import net.minecraft.network.protocol.game.*;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ClientInformation;
 import net.minecraft.server.level.ServerEntity;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.network.CommonListenerCookie;
+import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.PositionMoveRotation;
 import net.minecraft.world.entity.Relative;
@@ -44,9 +48,16 @@ public class ReplayNPC {
                 ClientInformation.createDefault()
         );
 
+        CommonListenerCookie cookie = CommonListenerCookie.createInitial(gameProfile, false);
+        npc.connection = new ServerGamePacketListenerImpl(
+                minecraftserver,
+                new Connection(PacketFlow.CLIENTBOUND),
+                npc,
+                cookie
+        );
+
         npc.setYRot(spawn.getYaw());
         npc.setXRot(spawn.getPitch());
-
     }
 
     public void spawn(Player viewer) {

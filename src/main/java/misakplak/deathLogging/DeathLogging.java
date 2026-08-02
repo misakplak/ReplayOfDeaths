@@ -24,31 +24,23 @@ public final class DeathLogging extends JavaPlugin {
     }
 
 
-    @Override
-    public void onLoad() {
-        PacketEvents.setAPI(
-                SpigotPacketEventsBuilder.build(this)
-        );
-        PacketEvents.getAPI().load();
-
-    }
     private final MongoManager mongoManager = new MongoManager();
+    private ReplayWorldManager replayWorldManager;
 
     @Override
     public void onEnable() {
         // Plugin startup logic
         instance = this;
         mongoManager.connect();
+        replayWorldManager = new ReplayWorldManager();
 
-        ReplayWorldManager replayWorldManager = new ReplayWorldManager();
-        replayWorldManager.getWorld();
-
+        replayWorldManager.load();
 
 
         replayStorage = new ReplayStorage(mongoManager.getDatabase());
 
+
         TickTracker.start();
-        PacketEvents.getAPI().init();
         new ReplayTask(new ReplayManager()).runTaskTimer(this, 1L, 1L);
         getServer().getPluginManager().registerEvents(new EventListeners(), this);
         getServer().getPluginManager().registerEvents(new ReplayGui(), this);
@@ -60,7 +52,6 @@ public final class DeathLogging extends JavaPlugin {
     public void onDisable() {
         // Plugin shutdown logic
         instance = null;
-        PacketEvents.getAPI().terminate();
         mongoManager.disconnect();
     }
 
@@ -70,5 +61,9 @@ public final class DeathLogging extends JavaPlugin {
 
     public MongoManager getMongoManager() {
         return mongoManager;
+    }
+
+    public ReplayWorldManager getReplayWorldManager() {
+        return replayWorldManager;
     }
 }
