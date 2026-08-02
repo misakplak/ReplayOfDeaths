@@ -10,6 +10,7 @@ import net.minecraft.server.level.ServerPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -128,18 +129,11 @@ public class ReplayViewer {
             case SwingArmRecord swing ->
                     npc.PlayHandSwingAnimation(viewer, swing.hand());
 
-            /* TODO: /*
-
-            case CritAnimationRecord crit ->
-
-                    npc.playCritAnimation(viewer);
-                    }
-
             case BlockBreakRecord block ->
-                    replayBlockBreaker.breakBlock(block);
+                    npc.PlayHandSwingAnimation(viewer, SwingHand.MAIN);
 
             case BlockPlaceRecord block ->
-                    replayBlockPlacer.placeBlock(block);
+                    placeBlock(block);
 
             case EntitySpawnRecord spawn ->
                     spawnEntity(spawn);
@@ -149,6 +143,19 @@ public class ReplayViewer {
 
             case EntityRemoveRecord remove ->
                     removeEntity(remove);
+
+            /* TODO: /*
+
+            case CritAnimationRecord crit ->
+
+                    npc.playCritAnimation(viewer);
+                    }
+
+
+
+            case BlockPlaceRecord block ->
+                    replayBlockPlacer.placeBlock(block);
+
 
              */
 
@@ -170,14 +177,14 @@ public class ReplayViewer {
     private void spawnEntity(EntitySpawnRecord record) {
         Location location = toReplayLocation(record.position());
 
-        Entity entity = plotOrigin.getWorld().spawnEntity(
-                location,
-                record.entityType()
-        );
+        Entity entity = plotOrigin.getWorld().spawnEntity(location, record.entityType());
+        entity.setInvulnerable(true);
+        entity.setSilent(true);
+        if (entity instanceof Mob mob) {
+            mob.setAI(false);
+        }
 
         entities.put(record.entityId(), entity);
-
-
     }
 
     private void moveEntity(EntityMoveRecord record) {
@@ -198,6 +205,11 @@ public class ReplayViewer {
         if (entity != null) {
             entity.remove();
         }
+    }
+
+    public void placeBlock(BlockPlaceRecord record) {
+
+
     }
 
 }

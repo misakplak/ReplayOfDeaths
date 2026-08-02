@@ -3,6 +3,7 @@ package misakplak.deathLogging.database;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
+import misakplak.deathLogging.misc.SwingHand;
 import misakplak.deathLogging.recordables.*;
 import misakplak.deathLogging.replay.Replay;
 import org.bson.Document;
@@ -107,6 +108,13 @@ public class ReplayStorage {
                         .append("uuid", remove.entityId().toString()));
             }
 
+            if (record instanceof SwingArmRecord swingArmRecord) {
+                records.add(new Document()
+                        .append("type", "SWING")
+                        .append("tick", tick)
+                        .append("swing", SwingHand.MAIN));
+            }
+
         }
 
         Document replayDoc = new Document()
@@ -156,6 +164,15 @@ public class ReplayStorage {
             String type = record.getString("type");
 
             switch (type) {
+
+
+                case "SWING" -> {
+
+                    records.add(new SwingArmRecord(
+                            record.getLong("tick"),
+                            record.get("swing", SwingHand.MAIN)
+                    ));
+                }
 
                 case "DAMAGE" -> {
                     Position position = position(record.get("position", Document.class));

@@ -65,6 +65,8 @@ public class ReplayGui implements Listener {
                 Replay replay = replayStorage.loadLatest();
 
                 replayManaging.play(p, replay.replayId());
+                p.closeInventory();
+                p.sendMessage("§aPlaying replay");
 
             }
         }

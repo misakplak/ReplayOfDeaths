@@ -3,6 +3,7 @@ package misakplak.deathLogging.listeners;
 import io.papermc.paper.event.player.PlayerPickItemEvent;
 import misakplak.deathLogging.DeathLogging;
 import misakplak.deathLogging.database.ReplayStorage;
+import misakplak.deathLogging.misc.SwingHand;
 import misakplak.deathLogging.recordables.*;
 import misakplak.deathLogging.replay.*;
 import org.bukkit.Bukkit;
@@ -251,6 +252,18 @@ public class EventListeners implements Listener {
         ));
 
 
+    }
+
+    @EventHandler
+    public void onSwing(PlayerAnimationEvent event) {
+        Player player = event.getPlayer();
+        ReplayBuffer buffer = manager.get(player);
+
+        if (buffer == null) {
+            return;
+        }
+
+        buffer.add(new SwingArmRecord(TickTracker.getTick(), SwingHand.MAIN));
     }
 
 
