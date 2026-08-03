@@ -2,6 +2,7 @@ package misakplak.deathLogging;
 
 import misakplak.deathLogging.commands.ReplayCommand;
 import misakplak.deathLogging.database.MongoManager;
+import misakplak.deathLogging.guis.PlayerReplayGui;
 import misakplak.deathLogging.guis.ReplayGui;
 import misakplak.deathLogging.listeners.EventListeners;
 import misakplak.deathLogging.replay.ReplayManager;
@@ -10,7 +11,12 @@ import misakplak.deathLogging.replay.loading.ReplayManaging;
 import misakplak.deathLogging.replay.world.ReplayWorldManager;
 import misakplak.deathLogging.replay.TickTracker;
 import misakplak.deathLogging.replay.tasks.ReplayTask;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 public final class DeathLogging extends JavaPlugin {
 
@@ -19,6 +25,13 @@ public final class DeathLogging extends JavaPlugin {
 
     public static DeathLogging getInstance() {
         return instance;
+    }
+
+
+    private final Map<UUID, OfflinePlayer> replayTargets = new HashMap<>();
+
+    public Map<UUID, OfflinePlayer> getReplayTargets() {
+        return replayTargets;
     }
 
 
@@ -50,6 +63,7 @@ public final class DeathLogging extends JavaPlugin {
         new ReplayTask(replayManager).runTaskTimer(this, 1L, 1L);
         getServer().getPluginManager().registerEvents(new EventListeners(replayManager), this);
         getServer().getPluginManager().registerEvents(new ReplayGui(), this);
+        getServer().getPluginManager().registerEvents(new PlayerReplayGui(), this);
         getCommand("replay").setExecutor(new ReplayCommand());
 
     }
@@ -82,4 +96,5 @@ public final class DeathLogging extends JavaPlugin {
     public ReplayManaging getReplayManaging() {
         return replayManaging;
     }
+
 }

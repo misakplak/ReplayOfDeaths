@@ -10,6 +10,7 @@ import misakplak.deathLogging.replay.loading.ReplayManaging;
 import misakplak.deathLogging.replay.world.ReplayWorldManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -25,7 +26,7 @@ public class ReplayGui implements Listener {
 
     public Inventory getInventory(Player player) {
 
-        Inventory inventory = Bukkit.createInventory(player, 9, "§aReplay");
+        Inventory inventory = Bukkit.createInventory(player, 9, "replays");
 
         ItemStack deaths = new MakeItem(Material.GREEN_DYE)
                 .setName("§c§lDeaths")
@@ -33,7 +34,7 @@ public class ReplayGui implements Listener {
 
 
          ItemStack kills = new MakeItem(Material.RED_DYE)
-                .setName("§c§lDeaths")
+                .setName("§c§lKills")
                 .build();
 
 
@@ -50,7 +51,7 @@ public class ReplayGui implements Listener {
         Player p = (Player) e.getWhoClicked();
         ItemStack item = e.getCurrentItem();
 
-        if (!e.getView().getTitle().equals("§aReplay")) {
+        if (!e.getView().getTitle().equals("replays")) {
             return;
         }
 
@@ -62,25 +63,18 @@ public class ReplayGui implements Listener {
 
 
 
+        PlayerReplayGui gui = new  PlayerReplayGui();
+
         switch (item.getType()) {
 
             case GREEN_DYE -> {
-                ReplayManaging replayManaging = DeathLogging.getInstance().getReplayManaging();
-                Replay replay = DeathLogging.getInstance().getReplayStorage().loadLatest();
 
-                if (replay == null) {
-                    p.sendMessage("§cNo replays found!");
-                    return;
-                }
-
-                replayManaging.play(p, replay.replayId());
-                p.closeInventory();
-                p.sendMessage("§aPlaying replay");
+              p.openInventory(gui.getInventory(DeathLogging.getInstance().getReplayTargets().remove(p.getUniqueId()), 0));
             }
 
             case RED_DYE -> {
-                ReplayWorldManager replayWorldManager = DeathLogging.getInstance().getReplayWorldManager();
-                Replay replay = DeathLogging.getInstance().getReplayStorage().loadLatest();
+
+                p.openInventory(gui.getInventory(DeathLogging.getInstance().getReplayTargets().remove(p.getUniqueId()), 0));
             }
 
 

@@ -42,7 +42,7 @@ public class PlayerReplayGui implements Listener {
 
         @Override
         public Inventory getInventory() {
-            return null; // Bukkit doesn't need this filled in for our use
+            return null;
         }
     }
 
@@ -83,7 +83,7 @@ public class PlayerReplayGui implements Listener {
 
             ItemMeta meta = item.getItemMeta();
             meta.getPersistentDataContainer().set(replayKey, PersistentDataType.STRING, replayId);
-            item.setItemMeta(meta);   // <- the missing piece
+            item.setItemMeta(meta);
 
             inventory.setItem(slot++, item);
         }
