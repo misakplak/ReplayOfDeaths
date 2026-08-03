@@ -37,14 +37,15 @@ public final class DeathLogging extends JavaPlugin {
         replayManaging = new ReplayManaging(replayStorage, replayWorldManager);
 
         replayWorldManager.load();
+        replayManager = new ReplayManager();
 
 
 
 
 
         TickTracker.start();
-        new ReplayTask(new ReplayManager()).runTaskTimer(this, 1L, 1L);
-        getServer().getPluginManager().registerEvents(new EventListeners(), this);
+        new ReplayTask(replayManager).runTaskTimer(this, 1L, 1L);
+        getServer().getPluginManager().registerEvents(new EventListeners(replayManager), this);
         getServer().getPluginManager().registerEvents(new ReplayGui(), this);
         getCommand("replay").setExecutor(new ReplayCommand());
 
@@ -57,12 +58,18 @@ public final class DeathLogging extends JavaPlugin {
         mongoManager.disconnect();
     }
 
+    private ReplayManager replayManager = new ReplayManager();
+
     public ReplayStorage getReplayStorage() {
         return replayStorage;
     }
 
     public MongoManager getMongoManager() {
         return mongoManager;
+    }
+
+    public ReplayManager getReplayManager() {
+        return replayManager;
     }
 
     public ReplayWorldManager getReplayWorldManager() {

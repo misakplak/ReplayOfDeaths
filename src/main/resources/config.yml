@@ -1,0 +1,4 @@
+log:
+  log-deaths: true
+  log-duration: 300 #in ticks, 20 ticks = 1s
+  log-world-size:

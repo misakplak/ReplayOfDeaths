@@ -23,10 +23,14 @@ import java.util.UUID;
 
 public class EventListeners implements Listener {
 
-    private final ReplayManager manager = new ReplayManager();
+    private final ReplayManager manager;
     private final LocationRecorder locationRecorder = new LocationRecorder();
     private final ReplayStorage replayStorage = DeathLogging.getInstance().getReplayStorage();
 
+
+    public EventListeners(ReplayManager manager) {
+        this.manager = manager;
+    }
     @EventHandler
     public void onJoin(PlayerJoinEvent event){
 
