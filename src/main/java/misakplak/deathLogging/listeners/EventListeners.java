@@ -234,33 +234,6 @@ public class EventListeners implements Listener {
     }
 
     @EventHandler
-    public void onMove(PlayerMoveEvent event){
-        Player player = event.getPlayer();
-        ReplayBuffer buffer = manager.get(player);
-
-        Position position = new Position(
-                event.getPlayer().getX(),
-                event.getPlayer().getY(),
-                event.getPlayer().getZ(),
-                event.getPlayer().getYaw(),
-                event.getPlayer().getPitch()
-        );
-
-        if (buffer == null) {
-            return;
-        }
-
-        long tick = TickTracker.getTick();
-
-        buffer.add(new LocationRecord(
-                tick,
-                position
-        ));
-
-
-    }
-
-    @EventHandler
     public void onSwing(PlayerAnimationEvent event) {
         Player player = event.getPlayer();
         ReplayBuffer buffer = manager.get(player);

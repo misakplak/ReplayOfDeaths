@@ -8,7 +8,6 @@ import misakplak.deathLogging.recordables.*;
 import misakplak.deathLogging.replay.Replay;
 import org.bson.Document;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 import org.bukkit.event.entity.EntityDamageEvent;
@@ -30,11 +29,13 @@ public class ReplayStorage {
 
         List<Document> records = new ArrayList<>();
 
-        long firstTick = replay.records().getFirst().tick();
+        long lastTick = replay.records().getLast().tick();
+        long firstTick = lastTick - 300;
+
 
         for (Recordable record : replay.records()) {
 
-            long tick = record.tick() - firstTick;
+            long tick = Math.max(0, record.tick() - firstTick);
 
             if (record instanceof DamageRecord damage) {
                 records.add(new Document()
