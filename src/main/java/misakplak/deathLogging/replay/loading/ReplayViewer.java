@@ -6,6 +6,7 @@ import misakplak.deathLogging.recordables.*;
 import misakplak.deathLogging.replay.LocationRecorder;
 import misakplak.deathLogging.replay.Replay;
 import misakplak.deathLogging.replay.ReplayNPC;
+import misakplak.deathLogging.replay.world.ReplayOffset;
 import net.minecraft.server.level.ServerPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -32,9 +33,15 @@ public class ReplayViewer {
     private int nextRecord = 0;
     private long replayTick = 0;
 
+    /*
+
     private final double offsetX;
     private final double offsetZ;
     private final double offsetY;
+
+     */
+
+    private ReplayOffset offset;
     private final Runnable onEnd;
 
     private boolean active = true;
@@ -47,19 +54,16 @@ public class ReplayViewer {
     public ReplayViewer(Player viewer,
                         Replay replay,
                         Location plotOrigin,
-                        Runnable onEnd
-
-    ) {
+                        Runnable onEnd) {
 
         this.viewer = viewer;
         this.replay = replay;
         this.plotOrigin = plotOrigin;
         this.onEnd = onEnd;
 
-        this.offsetX = plotOrigin.getX() - replay.getDeathlocation().getX();
-        this.offsetZ = plotOrigin.getZ() - replay.getDeathlocation().getZ();
-        this.offsetY = plotOrigin.getY() - replay.getDeathlocation().getY();
+        this.offset = ReplayOffset.between(replay.getDeathlocation(), plotOrigin);
     }
+
 
     public void spawn() {
 
@@ -72,7 +76,7 @@ public class ReplayViewer {
         if (first == null)
             return;
 
-        Location spawn = Position.toLocation(first.position(), plotOrigin.getWorld());
+        Location spawn = offset.apply(Position.toLocation(first.position(), plotOrigin.getWorld()));
 
         spawn.add(
                 plotOrigin.getX() - replay.getDeathlocation().getX(),
@@ -127,7 +131,7 @@ public class ReplayViewer {
         switch (record) {
 
             case LocationRecord move ->
-                    npc.teleport(viewer, toReplayLocation(move.position()));
+                    npc.teleport(viewer, move.position());
 
             case DamageRecord damage ->
                     npc.PlayHurtAnimation(viewer);
@@ -172,11 +176,8 @@ public class ReplayViewer {
     private Location toReplayLocation(Position position) {
 
 
-        Location location = Position.toLocation(position, plotOrigin.getWorld());
 
-        location.add(offsetX, offsetY, offsetZ);
-
-        return location;
+        return offset.apply(Position.toLocation(position, plotOrigin.getWorld()));
     }
 
     private void spawnEntity(EntitySpawnRecord record) {

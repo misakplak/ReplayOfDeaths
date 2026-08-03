@@ -13,7 +13,7 @@ public class PlotCopier {
         World source = sourceCenter.getWorld();
         World plot = plotOrigin.getWorld();
 
-        int yOffset = plotOrigin.getBlockY() - sourceCenter.getBlockY();
+        ReplayOffset offset = ReplayOffset.between(sourceCenter, plotOrigin);
 
         for (int x = -RADIUS; x <= RADIUS; x++) {
             for (int z = -RADIUS; z <= RADIUS; z++) {
@@ -23,7 +23,7 @@ public class PlotCopier {
 
                     if (sourceBlock.isEmpty()) continue;
 
-                    int targetY = y + yOffset;
+                    int targetY = y + offset.y();
                     if (targetY < plot.getMinHeight() || targetY >= plot.getMaxHeight()) continue;
 
                     Block targetBlock = plot.getBlockAt(

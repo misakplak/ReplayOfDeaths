@@ -16,12 +16,10 @@ public class PlotRollback {
 
     public void rollback(Replay replay, Location plotOrigin) {
 
-        World plot =  plotOrigin.getWorld();
+        World plot = plotOrigin.getWorld();
         Location deathLocation = replay.getDeathlocation();
 
-        int offsetX = plotOrigin.getBlockX() - deathLocation.getBlockX();
-        int offsetY = plotOrigin.getBlockY() - deathLocation.getBlockY();
-        int offsetZ = plotOrigin.getBlockZ() - deathLocation.getBlockZ();
+        ReplayOffset offset = ReplayOffset.between(deathLocation, plotOrigin);
 
         List<Recordable> records = replay.getRecords();
 
@@ -29,20 +27,18 @@ public class PlotRollback {
             Recordable record = records.get(i);
 
             if (record instanceof BlockBreakRecord broken) {
-                setBlock(plot, broken.position(), offsetX, offsetY, offsetZ, broken.material());
+                setBlock(plot, broken.position(), offset, broken.material());
             }
 
             if (record instanceof BlockPlaceRecord placed) {
-                setBlock(plot, placed.position(), offsetX, offsetY, offsetZ, Material.AIR);
+                setBlock(plot, placed.position(), offset, Material.AIR);
             }
         }
-
     }
 
-    private void setBlock(World plot, Position position, int offsetX, int offsetY, int offsetZ, Material material) {
-        Location location = Position.toLocation(position, plot);
-        location.add(offsetX, offsetY, offsetZ);
-        location.getBlock().setType(material, false);
+    private void setBlock(World plot, Position position, ReplayOffset offset, Material material) {
+        Location target = offset.apply(Position.toLocation(position, plot));
+        target.getBlock().setType(material, false);
     }
 
 

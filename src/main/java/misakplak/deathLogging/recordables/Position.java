@@ -25,4 +25,10 @@ public record Position(
         return location;
     }
 
+    public static Position toPosition(Location location){
+        Position position = new Position(location.getX(), location.getY(), location.getZ(), location.getYaw(), location.getPitch());
+
+        return position;
+    }
+
 }

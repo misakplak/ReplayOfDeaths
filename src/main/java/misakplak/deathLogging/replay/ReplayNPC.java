@@ -124,11 +124,11 @@ public class ReplayNPC {
         );
     }
 
-    public void teleport(Player viewer, Location location) {
+    public void teleport(Player viewer, Position location) {
 
-        npc.setPos(location.getX(), location.getY(), location.getZ());
-        npc.setYRot(location.getYaw());
-        npc.setXRot(location.getPitch());
+        npc.setPos(location.x(), location.x(), location.x());
+        npc.setYRot(location.yaw());
+        npc.setXRot(location.pitch());
 
         ClientboundTeleportEntityPacket packet =
                 ClientboundTeleportEntityPacket.teleport(
@@ -136,8 +136,8 @@ public class ReplayNPC {
                         new net.minecraft.world.entity.PositionMoveRotation(
                                 npc.position(),
                                 npc.getDeltaMovement(),
-                                location.getYaw(),
-                                location.getPitch()
+                                location.yaw(),
+                                location.pitch()
                         ),
                         java.util.Set.of(),
                         npc.onGround()
@@ -148,7 +148,7 @@ public class ReplayNPC {
         ((CraftPlayer) viewer).getHandle().connection.send(
                 new ClientboundRotateHeadPacket(
                         npc,
-                        (byte) (location.getYaw() * 256.0F / 360.0F)
+                        (byte) (location.pitch() * 256.0F / 360.0F)
                 )
         );
     }
