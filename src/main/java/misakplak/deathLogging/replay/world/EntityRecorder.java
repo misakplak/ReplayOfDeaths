@@ -63,7 +63,7 @@ public class EntityRecorder {
     private boolean isTrackable(Entity entity) {
         return switch (entity.getType()) {
             case ARMOR_STAND, ITEM, EXPERIENCE_ORB, ARROW, SPECTRAL_ARROW,
-                 TRIDENT, FIREWORK_ROCKET, FISHING_BOBBER, ITEM_FRAME, PAINTING -> false;
+                 TRIDENT, FIREWORK_ROCKET, FISHING_BOBBER, ITEM_FRAME, PAINTING, PLAYER -> false;
             default -> true;
         };
     }

@@ -8,17 +8,17 @@ import misakplak.deathLogging.replay.Replay;
 import misakplak.deathLogging.replay.ReplayNPC;
 import misakplak.deathLogging.replay.world.ReplayOffset;
 import net.minecraft.server.level.ServerPlayer;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Material;
+import org.bukkit.*;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityDropItemEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitTask;
+import org.bukkit.util.Vector;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class ReplayViewer {
 
@@ -96,6 +96,9 @@ public class ReplayViewer {
         entities.values().forEach(Entity::remove);
         entities.clear();
 
+        ghostItems.forEach(Item::remove);
+        ghostItems.clear();
+
         if (onEnd != null) onEnd.run();
     }
 
@@ -104,7 +107,13 @@ public class ReplayViewer {
 
             Recordable record = replay.getRecords().get(nextRecord);
             if (record.tick() > replayTick) break;
-            play(record);
+
+            try {
+                play(record);
+            } catch (Exception e) {
+                DeathLogging.getInstance().getLogger().warning("Skipping bad record: " + record);
+            }
+
             nextRecord++;
 
         }
@@ -146,6 +155,13 @@ public class ReplayViewer {
             case EntityRemoveRecord remove ->
                     removeEntity(remove);
 
+            case DropItemRecord drop ->
+                spawnGhostItem(drop);
+
+            case PickupItemRecord pickup ->
+                pickupEfect(pickup);
+
+
 
             /* TODO: /*
 
@@ -173,8 +189,9 @@ public class ReplayViewer {
     }
 
     private void spawnEntity(EntitySpawnRecord record) {
-        Location location = toReplayLocation(record.position());
+        if (!record.entityType().isSpawnable()) return;
 
+        Location location = toReplayLocation(record.position());
         Entity entity = plotOrigin.getWorld().spawnEntity(location, record.entityType());
         entity.setInvulnerable(true);
         entity.setSilent(true);
@@ -212,6 +229,36 @@ public class ReplayViewer {
 
     public void placeBlock(BlockPlaceRecord record) {
         toReplayLocation(record.position()).getBlock().setType(record.material());
+    }
+
+    private final List<Item> ghostItems = new ArrayList<>();
+
+    public void spawnGhostItem(DropItemRecord record) {
+
+        Location location = toReplayLocation(record.position());
+
+        Item item = location.getWorld().dropItem(location, new ItemStack(record.material()));
+        item.setPickupDelay(Integer.MAX_VALUE);
+        item.setInvulnerable(true);
+        item.setSilent(false);
+        item.setGravity(false);
+        item.setVelocity(new Vector(0, 0, 0));
+
+        ghostItems.add(item);
+
+        Bukkit.getScheduler().runTaskLater(DeathLogging.getInstance(), () -> {
+            if (!item.isValid()){
+                item.remove();
+                ghostItems.remove(item);
+            }
+        }, 60L);
+
+
+    }
+
+    public void pickupEfect(PickupItemRecord record) {
+        Location location = toReplayLocation(record.position());
+        location.getWorld().playSound(location, Sound.ENTITY_ITEM_PICKUP, 1, 1);
     }
 
 }

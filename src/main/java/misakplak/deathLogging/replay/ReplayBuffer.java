@@ -11,21 +11,23 @@ import java.util.*;
 public class ReplayBuffer {
 
     private long startTick;
-    private final List<Recordable> records = new ArrayList<>();
     private final Set<UUID> trackedEntities = new HashSet<>();
 
 
 
-    public void add(Recordable record) {
+    private final Deque<Recordable> records = new ArrayDeque<>();
 
+    public void add(Recordable record) {
         records.add(record);
 
         long oldestAllowedTick = record.tick() - 300;
 
-        while (!records.isEmpty() && records.getFirst().tick() < oldestAllowedTick) {
-            records.removeFirst();
+        while (!records.isEmpty() && records.peekFirst().tick() < oldestAllowedTick) {
+            records.pollFirst();
         }
     }
+
+
 
 
     public ReplayBuffer() {
@@ -36,7 +38,7 @@ public class ReplayBuffer {
         return startTick;
     }
 
-    public List<Recordable> getRecords(){
+    public List<Recordable> getRecords() {
         return new ArrayList<>(records);
     }
 
