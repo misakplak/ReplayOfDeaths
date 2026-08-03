@@ -3,6 +3,7 @@ package misakplak.deathLogging.replay.loading;
 import misakplak.deathLogging.database.ReplayStorage;
 import misakplak.deathLogging.replay.Replay;
 import misakplak.deathLogging.replay.world.PlotCopier;
+import misakplak.deathLogging.replay.world.PlotRollback;
 import misakplak.deathLogging.replay.world.ReplayWorldManager;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -18,6 +19,7 @@ public class ReplayManaging {
 
     private final ReplayWorldManager replayWorldManager;
     private final PlotCopier plotCopier;
+    private final PlotRollback plotRollback = new PlotRollback();
 
     public ReplayManaging(ReplayStorage storage, ReplayWorldManager replayWorldManager){
         this.storage = storage;
@@ -36,16 +38,17 @@ public class ReplayManaging {
             return;
         }
 
-// Allocate a plot
         Location plot = replayWorldManager
                 .getPlotManager()
                 .getPlot(replayWorldManager.getWorld(), replay.getReplayId());
 
-// Copy terrain
         plotCopier.copy(replay.getDeathlocation(), plot);
+        plotRollback.rollback(replay, plot);
 
-//  create session
-        ReplaySession session = new ReplaySession(player, replay, plot);
+
+        ReplaySession session = new ReplaySession(player, replay, plot,
+                () -> sessions.remove(player.getUniqueId())
+                );
 
         sessions.put(player.getUniqueId(), session);
         session.start();

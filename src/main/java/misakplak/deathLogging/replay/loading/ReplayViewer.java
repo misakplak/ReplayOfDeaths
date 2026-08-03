@@ -9,6 +9,7 @@ import misakplak.deathLogging.replay.ReplayNPC;
 import net.minecraft.server.level.ServerPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
@@ -34,6 +35,9 @@ public class ReplayViewer {
     private final double offsetX;
     private final double offsetZ;
     private final double offsetY;
+    private final Runnable onEnd;
+
+    private boolean active = true;
 
 
     private ReplayNPC npc;
@@ -42,11 +46,15 @@ public class ReplayViewer {
 
     public ReplayViewer(Player viewer,
                         Replay replay,
-                        Location plotOrigin) {
+                        Location plotOrigin,
+                        Runnable onEnd
+
+    ) {
 
         this.viewer = viewer;
         this.replay = replay;
         this.plotOrigin = plotOrigin;
+        this.onEnd = onEnd;
 
         this.offsetX = plotOrigin.getX() - replay.getDeathlocation().getX();
         this.offsetZ = plotOrigin.getZ() - replay.getDeathlocation().getZ();
@@ -83,28 +91,26 @@ public class ReplayViewer {
         );
     }
     public void despawn() {
+        if (!active) return;
+        active = false;
 
-        if(task != null)
-            task.cancel();
+        if (task != null) task.cancel();
 
         npc.destroy(viewer);
-
         entities.values().forEach(Entity::remove);
         entities.clear();
+
+        if (onEnd != null) onEnd.run();
     }
 
     private void tick() {
-
-        while(nextRecord < replay.getRecords().size()) {
+        while (nextRecord < replay.getRecords().size()) {
 
             Recordable record = replay.getRecords().get(nextRecord);
-
-            if(record.tick() > replayTick)
-                break;
-
+            if (record.tick() > replayTick) break;
             play(record);
-
             nextRecord++;
+
         }
 
         replayTick++;
@@ -130,7 +136,7 @@ public class ReplayViewer {
                     npc.PlayHandSwingAnimation(viewer, swing.hand());
 
             case BlockBreakRecord block ->
-                    npc.PlayHandSwingAnimation(viewer, SwingHand.MAIN);
+                    breakBlock(block);
 
             case BlockPlaceRecord block ->
                     placeBlock(block);
@@ -144,17 +150,16 @@ public class ReplayViewer {
             case EntityRemoveRecord remove ->
                     removeEntity(remove);
 
+
             /* TODO: /*
 
             case CritAnimationRecord crit ->
-
                     npc.playCritAnimation(viewer);
                     }
 
 
+                 and more data
 
-            case BlockPlaceRecord block ->
-                    replayBlockPlacer.placeBlock(block);
 
 
              */
@@ -207,9 +212,13 @@ public class ReplayViewer {
         }
     }
 
+
+    private void breakBlock(BlockBreakRecord record) {
+        toReplayLocation(record.position()).getBlock().setType(Material.AIR);
+    }
+
     public void placeBlock(BlockPlaceRecord record) {
-
-
+        toReplayLocation(record.position()).getBlock().setType(record.material());
     }
 
 }

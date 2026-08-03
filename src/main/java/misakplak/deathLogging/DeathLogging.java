@@ -6,6 +6,7 @@ import misakplak.deathLogging.guis.ReplayGui;
 import misakplak.deathLogging.listeners.EventListeners;
 import misakplak.deathLogging.replay.ReplayManager;
 import misakplak.deathLogging.database.ReplayStorage;
+import misakplak.deathLogging.replay.loading.ReplayManaging;
 import misakplak.deathLogging.replay.world.ReplayWorldManager;
 import misakplak.deathLogging.replay.TickTracker;
 import misakplak.deathLogging.replay.tasks.ReplayTask;
@@ -24,17 +25,21 @@ public final class DeathLogging extends JavaPlugin {
     private final MongoManager mongoManager = new MongoManager();
     private ReplayWorldManager replayWorldManager;
 
+    private ReplayManaging replayManaging;
+
     @Override
     public void onEnable() {
         // Plugin startup logic
         instance = this;
         mongoManager.connect();
         replayWorldManager = new ReplayWorldManager();
+        replayStorage = new ReplayStorage(mongoManager.getDatabase());
+        replayManaging = new ReplayManaging(replayStorage, replayWorldManager);
 
         replayWorldManager.load();
 
 
-        replayStorage = new ReplayStorage(mongoManager.getDatabase());
+
 
 
         TickTracker.start();
@@ -62,5 +67,9 @@ public final class DeathLogging extends JavaPlugin {
 
     public ReplayWorldManager getReplayWorldManager() {
         return replayWorldManager;
+    }
+
+    public ReplayManaging getReplayManaging() {
+        return replayManaging;
     }
 }

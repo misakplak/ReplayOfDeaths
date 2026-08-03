@@ -34,6 +34,12 @@ public class EventListeners implements Listener {
     }
 
     @EventHandler
+    public void onQuit(PlayerQuitEvent event){
+        manager.remove(event.getPlayer());
+        DeathLogging.getInstance().getReplayManaging().stop(event.getPlayer());
+    }
+
+    @EventHandler
     public void onLeave(PlayerQuitEvent event){
         manager.remove(event.getPlayer());
     }

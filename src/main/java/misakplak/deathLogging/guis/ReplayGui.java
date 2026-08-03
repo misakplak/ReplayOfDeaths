@@ -56,19 +56,22 @@ public class ReplayGui implements Listener {
 
 
         switch (item.getType()) {
+
             case GREEN_DYE -> {
+                ReplayManaging replayManaging = DeathLogging.getInstance().getReplayManaging();
+                Replay replay = DeathLogging.getInstance().getReplayStorage().loadLatest();
 
-                ReplayStorage replayStorage = new ReplayStorage(DeathLogging.getInstance().getMongoManager().getDatabase());
-                ReplayWorldManager replayWorldManager = DeathLogging.getInstance().getReplayWorldManager();
-                ReplayManaging replayManaging = new ReplayManaging(replayStorage, replayWorldManager);
-
-                Replay replay = replayStorage.loadLatest();
+                if (replay == null) {
+                    p.sendMessage("§cNo replays found!");
+                    return;
+                }
 
                 replayManaging.play(p, replay.replayId());
                 p.closeInventory();
                 p.sendMessage("§aPlaying replay");
-
             }
+
+
         }
     }
 }

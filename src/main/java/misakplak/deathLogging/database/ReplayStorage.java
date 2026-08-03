@@ -112,7 +112,7 @@ public class ReplayStorage {
                 records.add(new Document()
                         .append("type", "SWING")
                         .append("tick", tick)
-                        .append("swing", SwingHand.MAIN));
+                        .append("swing", swingArmRecord.hand().name()));
             }
 
         }
@@ -170,7 +170,7 @@ public class ReplayStorage {
 
                     records.add(new SwingArmRecord(
                             record.getLong("tick"),
-                            record.get("swing", SwingHand.MAIN)
+                            SwingHand.valueOf(record.getString("swing"))
                     ));
                 }
 

@@ -1,5 +1,6 @@
 package misakplak.deathLogging.replay;
 
+import misakplak.deathLogging.recordables.Position;
 import misakplak.deathLogging.recordables.Recordable;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
@@ -56,7 +57,19 @@ public class ReplayBuffer {
         trackedEntities.remove(entity.getUniqueId());
     }
 
+
+    private final Map<UUID, Position> lastPositions = new HashMap<>();
+
+    public Position getLastPosition(UUID entity) {
+        return lastPositions.get(entity);
+    }
+
+    public void setLastPosition(UUID entity, Position position) {
+        lastPositions.put(entity, position);
+    }
+
     public void untrack(UUID uuid) {
         trackedEntities.remove(uuid);
+        lastPositions.remove(uuid);
     }
 }

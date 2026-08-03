@@ -15,6 +15,7 @@ public class ReplayTask extends BukkitRunnable {
 
     private final ReplayManager manager;
     private final LocationRecorder locationRecorder = new LocationRecorder();
+    private final EntityRecorder entityRecorder = new EntityRecorder();
 
     public ReplayTask(ReplayManager manager) {
         this.manager = manager;
@@ -30,19 +31,7 @@ public class ReplayTask extends BukkitRunnable {
                 continue;
 
             buffer.add(locationRecorder.record(player));
-
-            for (Entity entity : player.getNearbyEntities(50, 50, 50)) {
-
-                if (entity == player)
-                    continue;
-
-
-                if (entity.getType() == EntityType.ARMOR_STAND)
-                    continue;
-
-                EntityRecorder recorder = new EntityRecorder();
-                recorder.record(player,buffer);
-            }
+            entityRecorder.record(player, buffer);
         }
 
         TickTracker.nextTick();
