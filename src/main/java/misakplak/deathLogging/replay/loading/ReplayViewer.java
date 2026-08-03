@@ -26,8 +26,6 @@ public class ReplayViewer {
     private final Replay replay;
     private final Location plotOrigin;
 
-    private ServerPlayer replayPlayer;
-
     private BukkitTask task;
 
     private int nextRecord = 0;
@@ -78,12 +76,6 @@ public class ReplayViewer {
 
         Location spawn = offset.apply(Position.toLocation(first.position(), plotOrigin.getWorld()));
 
-        spawn.add(
-                plotOrigin.getX() - replay.getDeathlocation().getX(),
-                plotOrigin.getY() - replay.getDeathlocation().getY(),
-                plotOrigin.getZ() - replay.getDeathlocation().getZ()
-        );
-
         npc = new ReplayNPC(spawn, "Replay");
         npc.spawn(viewer);
 
@@ -131,7 +123,7 @@ public class ReplayViewer {
         switch (record) {
 
             case LocationRecord move ->
-                    npc.teleport(viewer, move.position());
+                    npc.teleport(viewer, toReplayLocation(move.position()));
 
             case DamageRecord damage ->
                     npc.PlayHurtAnimation(viewer);
