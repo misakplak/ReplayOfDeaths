@@ -5,8 +5,13 @@ import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import misakplak.deathLogging.DeathLogging;
+import misakplak.deathLogging.replay.Replay;
+import misakplak.deathLogging.replay.ReplayManager;
 import org.bson.Document;
 import org.bukkit.Bukkit;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class MongoManager {
@@ -51,6 +56,7 @@ public class MongoManager {
     public MongoCollection<Document> getReplayCollection() {
         return database.getCollection("replays");
     }
+
 
     public MongoDatabase getDatabase() {
         return database;

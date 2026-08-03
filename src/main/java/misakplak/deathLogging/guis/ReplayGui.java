@@ -31,7 +31,14 @@ public class ReplayGui implements Listener {
                 .setName("§c§lDeaths")
                 .build();
 
-        inventory.setItem(3, deaths);
+
+         ItemStack kills = new MakeItem(Material.RED_DYE)
+                .setName("§c§lDeaths")
+                .build();
+
+
+        inventory.setItem(2, deaths);
+        inventory.setItem(5, kills);
 
 
         return inventory;
@@ -69,6 +76,11 @@ public class ReplayGui implements Listener {
                 replayManaging.play(p, replay.replayId());
                 p.closeInventory();
                 p.sendMessage("§aPlaying replay");
+            }
+
+            case RED_DYE -> {
+                ReplayWorldManager replayWorldManager = DeathLogging.getInstance().getReplayWorldManager();
+                Replay replay = DeathLogging.getInstance().getReplayStorage().loadLatest();
             }
 
 
