@@ -1,5 +1,6 @@
 package misakplak.deathLogging.replay;
 
+import misakplak.deathLogging.recordables.EntitySpawnRecord;
 import misakplak.deathLogging.recordables.Position;
 import misakplak.deathLogging.recordables.Recordable;
 import org.bukkit.Bukkit;
@@ -22,9 +23,18 @@ public class ReplayBuffer {
 
         long oldestAllowedTick = record.tick() - 300;
 
-        while (!records.isEmpty() && records.peekFirst().tick() < oldestAllowedTick) {
-            records.pollFirst();
+        Iterator<Recordable> iterator = records.iterator();
+        while (iterator.hasNext()) {
+            Recordable next = iterator.next();
+
+            if (next.tick() >= oldestAllowedTick) break;
+            if (next instanceof EntitySpawnRecord) continue;
+
+            iterator.remove();
+
         }
+
+
     }
 
 

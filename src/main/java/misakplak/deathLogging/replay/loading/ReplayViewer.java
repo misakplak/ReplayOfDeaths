@@ -247,7 +247,7 @@ public class ReplayViewer {
         ghostItems.add(item);
 
         Bukkit.getScheduler().runTaskLater(DeathLogging.getInstance(), () -> {
-            if (!item.isValid()){
+            if (item.isValid()){
                 item.remove();
                 ghostItems.remove(item);
             }
