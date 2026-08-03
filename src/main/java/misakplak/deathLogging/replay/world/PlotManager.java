@@ -15,8 +15,8 @@ import java.util.logging.Level;
 
 public class PlotManager {
 
-    private static final int PLOT_SIZE = 100;
-    private static final int SPACING = 40;
+    private final int halfPlotSize;
+    private final int spacing;
     private static final int PLOTS_PER_ROW = 100;
 
     private final Map<UUID, int[]> plots = new HashMap<>();
@@ -25,24 +25,32 @@ public class PlotManager {
     private int nextIndex = 0;
 
     public PlotManager() {
+
+        this.halfPlotSize = DeathLogging.getInstance().getConfig().getInt("world.log-world-size");
+        this.spacing = DeathLogging.getInstance().getConfig().getInt("world.plot.plot-spacing");
+
         this.file = new File(DeathLogging.getInstance().getDataFolder(), "plots.yml");
+
+
         load();
     }
 
     public Location getPlot(World world, UUID replayId) {
 
-        int[] grid = plots.computeIfAbsent(replayId, id -> {
+        int[] grid = plots.get(replayId);
+
+        if (grid == null) {
             int index = nextIndex++;
-            int gridX = index % PLOTS_PER_ROW;
-            int gridZ = index / PLOTS_PER_ROW;
+            grid = new int[] {
+                    index % PLOTS_PER_ROW,
+                    index / PLOTS_PER_ROW
+            };
+            plots.put(replayId, grid);
             save();
+        }
 
-
-            return new int[]{gridX, gridZ};
-        });
-
-        int x = grid[0] * (PLOT_SIZE + SPACING);
-        int z = grid[1] * (PLOT_SIZE + SPACING);
+        int x = grid[0] * (halfPlotSize  * 2 + spacing);
+        int z = grid[1] * (halfPlotSize  * 2 + spacing);
 
         return new Location(world, x, 64, z);
     }

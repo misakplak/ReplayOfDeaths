@@ -22,7 +22,7 @@ public final class DeathLogging extends JavaPlugin {
     }
 
 
-    private final MongoManager mongoManager = new MongoManager();
+    private final MongoManager mongoManager = new MongoManager(this);
     private ReplayWorldManager replayWorldManager;
 
     private ReplayManaging replayManaging;
@@ -31,6 +31,8 @@ public final class DeathLogging extends JavaPlugin {
     public void onEnable() {
         // Plugin startup logic
         instance = this;
+        saveDefaultConfig();
+
         mongoManager.connect();
         replayWorldManager = new ReplayWorldManager();
         replayStorage = new ReplayStorage(mongoManager.getDatabase());
@@ -38,6 +40,7 @@ public final class DeathLogging extends JavaPlugin {
 
         replayWorldManager.load();
         replayManager = new ReplayManager();
+
 
 
 

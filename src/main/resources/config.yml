@@ -1,4 +1,23 @@
 log:
-  log-deaths: true
+  log-deaths: true  #logging on/off
   log-duration: 300 #in ticks, 20 ticks = 1s
-  log-world-size:
+
+
+world:
+  log-world-size: 50  #size of the plot size (world size)
+
+
+  plot:
+    plot-spacing: 40 #the space to reserve between each plot
+
+
+database:
+  mongodb:
+    #EXAMPLE OF ATLAS:  uri: mongodb+srv://USERNAME:PASSWORD@cluster0.xxxxx.mongodb.net/
+    #EXAMPLE OF LOCAL:  uri: mongodb://localhost:27017/
+
+    uri: "mongodb://localhost:27017"
+    database: deathloggingMC
+
+
+
