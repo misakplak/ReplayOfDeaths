@@ -1,110 +1,104 @@
 package misakplak.deathLogging.guis;
 
+import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.Sorts;
 import misakplak.deathLogging.DeathLogging;
-import misakplak.deathLogging.database.MongoManager;
-import misakplak.deathLogging.database.ReplayStorage;
 import misakplak.deathLogging.misc.MakeItem;
-import misakplak.deathLogging.replay.Replay;
 import org.bson.Document;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
 public class PlayerReplayGui implements Listener {
 
-    public Inventory getInventory(Player player, Player target, int page) {
+    private static final int PAGE_SIZE = 45;
 
-        Inventory inventory = Bukkit.createInventory(null, 54, "replays");
+    private final NamespacedKey replayKey =
+            new NamespacedKey(DeathLogging.getInstance(), "history-key");
 
-        List<Replay> replays = new ArrayList<>();
+    private static class Holder implements InventoryHolder {
+        final UUID target;
+        final int page;
 
-        NamespacedKey replayKey = new NamespacedKey(DeathLogging.getInstance(), "history-key");
-        MongoManager manager = DeathLogging.getInstance().getMongoManager();
-
-        ReplayStorage storage = DeathLogging.getInstance().getReplayStorage(manager.getReplayCollection());
-
-        for (Document doc : manager.getReplayCollection().find()) {
-            UUID replayId = UUID.fromString(doc.getString("replayId"));
-            replays.add(storage.load(replayId));
+        Holder(UUID target, int page) {
+            this.target = target;
+            this.page = page;
         }
 
+        @Override
+        public Inventory getInventory() {
+            return null; // Bukkit doesn't need this filled in for our use
+        }
+    }
 
+    public Inventory getInventory(OfflinePlayer target, int page) {
 
-            if (records == null) {
-                return inventory;
-            }
+        List<Document> docs = DeathLogging.getInstance()
+                .getMongoManager()
+                .getReplayCollection()
+                .find(Filters.eq("playerId", target.getUniqueId().toString()))
+                .sort(Sorts.descending("createdAt"))
+                .into(new ArrayList<>());
 
-        int PAGE_SIZE = 45;
-        int totalPages = (int) Math.ceil(replays.size() / (double) PAGE_SIZE);
-        if (totalPages == 0) totalPages = 1;
-
+        int totalPages = Math.max(1, (int) Math.ceil(docs.size() / (double) PAGE_SIZE));
         page = Math.max(0, Math.min(page, totalPages - 1));
 
+        Holder holder = new Holder(target.getUniqueId(), page);
+        Inventory inventory = Bukkit.createInventory(
+                holder, 54, "§8" + target.getName() + "'s Replays");
+
         int start = page * PAGE_SIZE;
-        int end = Math.min(start + PAGE_SIZE, replays.size());
+        int end = Math.min(start + PAGE_SIZE, docs.size());
 
-        List<Replay> pageReplays = replays.subList(start, end);
+        int slot = 0;
+        for (Document doc : docs.subList(start, end)) {
 
+            String replayId = doc.getString("replayId");
+            long createdAt = doc.getLong("createdAt");
 
-            int slot = 0;
-
-
-            for (Replay replay : pageReplays) {
-
-                ItemStack item = new MakeItem(Material.DARK_OAK_SIGN)
-                        .setName("§fReplay")
-                        .setLoreLegacy(List.of(
-                                "§7Replay id:",
-                                "§f§l" + replay.getReplayId()
-                        ))
-                        .build();
-
-                ItemMeta meta = item.getItemMeta();
-
-                meta.getPersistentDataContainer().set(replayKey,
-                        PersistentDataType.STRING,
-                        replay.getReplayId().toString()
-                        );
-
-                inventory.setItem(slot++, item);
-            }
-
-
-            if (page > 0) {
-                ItemStack prev = new MakeItem(Material.ARROW)
-                        .setName("§ePrevious Page")
-                        .build();
-
-                inventory.setItem(45, prev);
-            }
-
-            if (page < totalPages - 1) {
-                ItemStack next = new MakeItem(Material.ARROW)
-                        .setName("§eNext Page")
-                        .build();
-
-
-                inventory.setItem(53, next);
-            }
-
-            ItemStack pageInfo = new MakeItem(Material.PAPER)
-                    .setName("§7Page " + (page + 1) + " / " + totalPages)
+            ItemStack item = new MakeItem(Material.DARK_OAK_SIGN)
+                    .setName("§fReplay")
+                    .setLoreLegacy(List.of(
+                            "§7Replay id:",
+                            "§f§l" + replayId,
+                            "",
+                            "§7" + new Date(createdAt)
+                    ))
                     .build();
 
-            inventory.setItem(49, pageInfo);
+            ItemMeta meta = item.getItemMeta();
+            meta.getPersistentDataContainer().set(replayKey, PersistentDataType.STRING, replayId);
+            item.setItemMeta(meta);   // <- the missing piece
 
+            inventory.setItem(slot++, item);
+        }
+
+        if (page > 0) {
+            inventory.setItem(45, new MakeItem(Material.ARROW).setName("§ePrevious Page").build());
+        }
+
+        if (page < totalPages - 1) {
+            inventory.setItem(53, new MakeItem(Material.ARROW).setName("§eNext Page").build());
+        }
+
+        inventory.setItem(49, new MakeItem(Material.PAPER)
+                .setName("§7Page " + (page + 1) + " / " + totalPages)
+                .build());
 
         return inventory;
     }
@@ -112,19 +106,39 @@ public class PlayerReplayGui implements Listener {
     @EventHandler
     public void onClick(InventoryClickEvent e) {
 
-        Player p = (Player) e.getWhoClicked();
-        ItemStack item = e.getCurrentItem();
-
-        if (!e.getView().getTitle().equals("replays")) {
+        if (!(e.getInventory().getHolder() instanceof Holder holder)) {
             return;
         }
 
         e.setCancelled(true);
 
-        if (item == null) {
+        Player p = (Player) e.getWhoClicked();
+        ItemStack item = e.getCurrentItem();
+
+        if (item == null || item.getType() == Material.AIR) {
             return;
         }
 
-        //what happens on clicks
+        if (item.getType() == Material.ARROW) {
+            OfflinePlayer target = Bukkit.getOfflinePlayer(holder.target);
+            String name = item.getItemMeta().getDisplayName();
+
+            if (name.equals("§ePrevious Page")) {
+                p.openInventory(getInventory(target, holder.page - 1));
+            } else if (name.equals("§eNext Page")) {
+                p.openInventory(getInventory(target, holder.page + 1));
+            }
+            return;
+        }
+
+        ItemMeta meta = item.getItemMeta();
+        if (meta == null) return;
+
+        String replayIdString = meta.getPersistentDataContainer().get(replayKey, PersistentDataType.STRING);
+        if (replayIdString == null) return;
+
+        DeathLogging.getInstance().getReplayManaging().play(p, UUID.fromString(replayIdString));
+        p.closeInventory();
+        p.sendMessage("§aPlaying replay");
     }
 }
