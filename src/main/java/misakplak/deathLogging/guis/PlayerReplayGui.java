@@ -50,7 +50,7 @@ public class PlayerReplayGui implements Listener {
     public Inventory getInventory(OfflinePlayer target, int page, boolean kills) {
         this.kills = kills;
 
-        String field = kills ? "killedId" : "playerId";
+        String field = kills ? "killerId" : "playerId";
 
         List<Document> docs = DeathLogging.getInstance()
                 .getMongoManager()

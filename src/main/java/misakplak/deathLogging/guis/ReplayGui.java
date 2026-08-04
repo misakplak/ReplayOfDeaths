@@ -34,16 +34,14 @@ public class ReplayGui implements Listener {
                 .setName("§c§lDeaths")
                 .build();
 
-
-         ItemStack kills = new MakeItem(Material.RED_DYE)
+        ItemStack kills = new MakeItem(Material.RED_DYE)
                 .setName("§c§lKills")
                 .build();
 
-         Player target = DeathLogging.getInstance().getReplayTargets().get(player.getUniqueId()).getPlayer();
-
-
         inventory.setItem(2, deaths);
         inventory.setItem(5, kills);
+
+        OfflinePlayer target = DeathLogging.getInstance().getReplayTargets().get(player.getUniqueId());
 
         ItemStack playerhead = new MakeItem(Material.PLAYER_HEAD)
                 .setName(target.getName())
@@ -79,15 +77,11 @@ public class ReplayGui implements Listener {
 
         switch (item.getType()) {
 
-            case GREEN_DYE -> {
+            case GREEN_DYE ->
+                    p.openInventory(gui.getInventory(DeathLogging.getInstance().getReplayTargets().get(p.getUniqueId()), 0, false));
 
-              p.openInventory(gui.getInventory(DeathLogging.getInstance().getReplayTargets().remove(p.getUniqueId()), 0, false));
-            }
-
-            case RED_DYE -> {
-
-                p.openInventory(gui.getInventory(DeathLogging.getInstance().getReplayTargets().remove(p.getUniqueId()), 0, true));
-            }
+            case RED_DYE ->
+                    p.openInventory(gui.getInventory(DeathLogging.getInstance().getReplayTargets().get(p.getUniqueId()), 0, true));
 
 
         }
