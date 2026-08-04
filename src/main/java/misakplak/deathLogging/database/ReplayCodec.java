@@ -100,7 +100,7 @@ public class ReplayCodec {
             if (record instanceof SwingArmRecord swingArmRecord) {
                 records.add(new Document()
                         .append("type", "SWING")
-                        .append("tick", tick)
+                        .append("tick", tick    )
                         .append("swing", swingArmRecord.hand().name()));
             }
         }
@@ -122,7 +122,7 @@ public class ReplayCodec {
         UUID killerId = killerString == null ? null : UUID.fromString(killerString);
 
         Position deathPosition = position(document.get("deathlocation", Document.class));
-        long createdAt = document.getLong("createdAt");
+        long createdAt = getLong(document, "createdAt");
 
         List<Document> recordsDocs = document.getList("records", Document.class);
         List<Recordable> records = new ArrayList<>();
@@ -131,61 +131,61 @@ public class ReplayCodec {
             switch (record.getString("type")) {
 
                 case "SWING" -> records.add(new SwingArmRecord(
-                        record.getLong("tick"),
+                        getLong(document, "tick"),
                         SwingHand.valueOf(record.getString("swing"))
                 ));
 
                 case "DAMAGE" -> records.add(new DamageRecord(
-                        record.getLong("tick"),
+                        getLong(document, "tick"),
                         position(record.get("position", Document.class)),
                         record.getDouble("damage"),
                         EntityDamageEvent.DamageCause.valueOf(record.getString("cause"))
                 ));
 
                 case "BLOCK_PLACE" -> records.add(new BlockPlaceRecord(
-                        record.getLong("tick"),
+                        getLong(document, "tick"),
                         position(record.get("position", Document.class)),
                         Material.getMaterial(record.getString("material"))
                 ));
 
                 case "BLOCK_BREAK" -> records.add(new BlockBreakRecord(
-                        record.getLong("tick"),
+                        getLong(document, "tick"),
                         position(record.get("position", Document.class)),
                         Material.getMaterial(record.getString("material"))
                 ));
 
                 case "MOVE" -> records.add(new LocationRecord(
-                        record.getLong("tick"),
+                        getLong(document, "tick"),
                         position(record.get("position", Document.class))
                 ));
 
                 case "ITEM_DROP" -> records.add(new DropItemRecord(
-                        record.getLong("tick"),
+                        getLong(document, "tick"),
                         position(record.get("position", Document.class)),
                         Material.getMaterial(record.getString("material"))
                 ));
 
                 case "ITEM_PICKUP" -> records.add(new PickupItemRecord(
-                        record.getLong("tick"),
+                        getLong(document, "tick"),
                         position(record.get("position", Document.class)),
                         Material.getMaterial(record.getString("material"))
                 ));
 
                 case "ENTITY_SPAWN" -> records.add(new EntitySpawnRecord(
-                        record.getLong("tick"),
+                        getLong(document, "tick"),
                         UUID.fromString(record.getString("uuid")),
                         EntityType.valueOf(record.getString("entityType")),
                         position(record.get("position", Document.class))
                 ));
 
                 case "ENTITY_MOVE" -> records.add(new EntityMoveRecord(
-                        record.getLong("tick"),
+                        getLong(document, "tick"),
                         UUID.fromString(record.getString("uuid")),
                         position(record.get("position", Document.class))
                 ));
 
                 case "ENTITY_REMOVE" -> records.add(new EntityRemoveRecord(
-                        record.getLong("tick"),
+                        getLong(document, "tick"),
                         UUID.fromString(record.getString("uuid"))
                 ));
             }
@@ -211,5 +211,9 @@ public class ReplayCodec {
                 document.getDouble("yaw").floatValue(),
                 document.getDouble("pitch").floatValue()
         );
+    }
+
+    private long getLong(Document document, String key) {
+        return ((Number) document.get(key)).longValue();
     }
 }
