@@ -2,6 +2,7 @@ package misakplak.deathLogging.listeners;
 
 import misakplak.deathLogging.DeathLogging;
 import misakplak.deathLogging.database.MongoReplayStorage;
+import misakplak.deathLogging.database.ReplayStorage;
 import misakplak.deathLogging.misc.SwingHand;
 import misakplak.deathLogging.recordables.*;
 import misakplak.deathLogging.replay.*;
@@ -21,7 +22,7 @@ public class EventListeners implements Listener {
 
     private final ReplayManager manager;
     private final LocationRecorder locationRecorder = new LocationRecorder();
-    private final MongoReplayStorage replayStorage = DeathLogging.getInstance().getReplayStorage();
+    private final ReplayStorage replayStorage = DeathLogging.getInstance().getReplayStorage();
 
 
     public EventListeners(ReplayManager manager) {

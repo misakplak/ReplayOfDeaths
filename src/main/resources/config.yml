@@ -12,6 +12,9 @@ world:
 
 
 database:
+
+  type: mongodb #or mysql
+
   mongodb:
     #EXAMPLE OF ATLAS:  uri: mongodb+srv://USERNAME:PASSWORD@cluster0.xxxxx.mongodb.net/
     #EXAMPLE OF LOCAL:  uri: mongodb://localhost:27017/

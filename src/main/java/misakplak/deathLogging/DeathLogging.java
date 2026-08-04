@@ -5,6 +5,7 @@ import com.zaxxer.hikari.HikariDataSource;
 import misakplak.deathLogging.commands.ReplayCommand;
 import misakplak.deathLogging.database.MongoManager;
 import misakplak.deathLogging.database.MySqlReplayStorage;
+import misakplak.deathLogging.database.ReplayStorage;
 import misakplak.deathLogging.guis.PlayerReplayGui;
 import misakplak.deathLogging.guis.ReplayGui;
 import misakplak.deathLogging.listeners.EventListeners;
@@ -24,7 +25,7 @@ import java.util.UUID;
 public final class DeathLogging extends JavaPlugin {
 
     private static DeathLogging instance;
-    private MongoReplayStorage replayStorage;
+    private ReplayStorage replayStorage;
 
     public static DeathLogging getInstance() {
         return instance;
@@ -45,12 +46,10 @@ public final class DeathLogging extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        // Plugin startup logic
         instance = this;
         saveDefaultConfig();
 
         replayWorldManager = new ReplayWorldManager();
-
 
         String type = getConfig().getString("database.type", "mongodb").toLowerCase();
 
@@ -67,9 +66,6 @@ public final class DeathLogging extends JavaPlugin {
             }
         };
 
-        mongoManager.connect();
-
-        replayStorage = new MongoReplayStorage(mongoManager.getDatabase());
         replayManaging = new ReplayManaging(replayStorage, replayWorldManager);
 
         replayWorldManager.load();
@@ -80,7 +76,6 @@ public final class DeathLogging extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new ReplayGui(), this);
         getServer().getPluginManager().registerEvents(new PlayerReplayGui(), this);
         getCommand("replay").setExecutor(new ReplayCommand());
-
     }
 
     @Override
@@ -92,9 +87,6 @@ public final class DeathLogging extends JavaPlugin {
 
     private ReplayManager replayManager = new ReplayManager();
 
-    public MongoReplayStorage getReplayStorage() {
-        return replayStorage;
-    }
 
     public MongoManager getMongoManager() {
         return mongoManager;
@@ -121,6 +113,10 @@ public final class DeathLogging extends JavaPlugin {
         config.setPassword(getConfig().getString("database.mysql.password"));
         config.setMaximumPoolSize(5);
         return new HikariDataSource(config);
+    }
+
+    public ReplayStorage getReplayStorage() {
+        return replayStorage;
     }
 
 }
