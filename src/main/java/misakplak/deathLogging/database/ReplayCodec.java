@@ -131,61 +131,61 @@ public class ReplayCodec {
             switch (record.getString("type")) {
 
                 case "SWING" -> records.add(new SwingArmRecord(
-                        getLong(document, "tick"),
+                        getLong(record, "tick"),
                         SwingHand.valueOf(record.getString("swing"))
                 ));
 
                 case "DAMAGE" -> records.add(new DamageRecord(
-                        getLong(document, "tick"),
+                        getLong(record, "tick"),
                         position(record.get("position", Document.class)),
                         record.getDouble("damage"),
                         EntityDamageEvent.DamageCause.valueOf(record.getString("cause"))
                 ));
 
                 case "BLOCK_PLACE" -> records.add(new BlockPlaceRecord(
-                        getLong(document, "tick"),
+                        getLong(record, "tick"),
                         position(record.get("position", Document.class)),
                         Material.getMaterial(record.getString("material"))
                 ));
 
                 case "BLOCK_BREAK" -> records.add(new BlockBreakRecord(
-                        getLong(document, "tick"),
+                        getLong(record, "tick"),
                         position(record.get("position", Document.class)),
                         Material.getMaterial(record.getString("material"))
                 ));
 
                 case "MOVE" -> records.add(new LocationRecord(
-                        getLong(document, "tick"),
+                        getLong(record, "tick"),
                         position(record.get("position", Document.class))
                 ));
 
                 case "ITEM_DROP" -> records.add(new DropItemRecord(
-                        getLong(document, "tick"),
+                        getLong(record, "tick"),
                         position(record.get("position", Document.class)),
                         Material.getMaterial(record.getString("material"))
                 ));
 
                 case "ITEM_PICKUP" -> records.add(new PickupItemRecord(
-                        getLong(document, "tick"),
+                        getLong(record, "tick"),
                         position(record.get("position", Document.class)),
                         Material.getMaterial(record.getString("material"))
                 ));
 
                 case "ENTITY_SPAWN" -> records.add(new EntitySpawnRecord(
-                        getLong(document, "tick"),
+                        getLong(record, "tick"),
                         UUID.fromString(record.getString("uuid")),
                         EntityType.valueOf(record.getString("entityType")),
                         position(record.get("position", Document.class))
                 ));
 
                 case "ENTITY_MOVE" -> records.add(new EntityMoveRecord(
-                        getLong(document, "tick"),
+                        getLong(record, "tick"),
                         UUID.fromString(record.getString("uuid")),
                         position(record.get("position", Document.class))
                 ));
 
                 case "ENTITY_REMOVE" -> records.add(new EntityRemoveRecord(
-                        getLong(document, "tick"),
+                        getLong(record, "tick"),
                         UUID.fromString(record.getString("uuid"))
                 ));
             }
