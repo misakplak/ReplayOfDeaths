@@ -43,6 +43,7 @@ public final class DeathLogging extends JavaPlugin {
     private ReplayWorldManager replayWorldManager;
 
     private ReplayManaging replayManaging;
+    private DataSource replayDataSource;
 
     @Override
     public void onEnable() {
@@ -54,10 +55,9 @@ public final class DeathLogging extends JavaPlugin {
         String type = getConfig().getString("database.type", "mongodb").toLowerCase();
 
         replayStorage = switch (type) {
-            case "mysql" -> new MySqlReplayStorage(buildMySqlDataSource());
-            case "mongodb" -> {
-                mongoManager.connect();
-                yield new MongoReplayStorage(mongoManager.getDatabase());
+            case "mysql" -> {
+                replayDataSource = buildMySqlDataSource();
+                yield new MySqlReplayStorage(replayDataSource);
             }
             default -> {
                 getLogger().warning("Unknown database.type '" + type + "' in config.yml — defaulting to mongodb.");
@@ -80,12 +80,15 @@ public final class DeathLogging extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        // Plugin shutdown logic
         instance = null;
         mongoManager.disconnect();
+
+        if (replayDataSource instanceof HikariDataSource hikari) {
+            hikari.close();
+        }
     }
 
-    private ReplayManager replayManager = new ReplayManager();
+    private ReplayManager replayManager;
 
 
     public MongoManager getMongoManager() {
