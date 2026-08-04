@@ -23,4 +23,7 @@ public class ReplayManager {
         return buffers.get(player.getUniqueId().toString());
     }
 
+    public ReplayBuffer getOrCreate(Player player) {
+        return buffers.computeIfAbsent(player.getUniqueId().toString(), id -> new ReplayBuffer());
+    }
 }

@@ -48,7 +48,7 @@ public class EventListeners implements Listener {
     @EventHandler
     public void onDeath(PlayerDeathEvent event) {
 
-        ReplayBuffer buffer = manager.get(event.getPlayer());
+        ReplayBuffer buffer = manager.getOrCreate(event.getPlayer());
 
 
         if (buffer == null) {
