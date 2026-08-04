@@ -128,7 +128,6 @@ public class ReplayStorage {
                 .append("records", records);
 
         collection.insertOne(replayDoc);
-        Bukkit.getLogger().info(replayDoc.toJson());
 
     }
 

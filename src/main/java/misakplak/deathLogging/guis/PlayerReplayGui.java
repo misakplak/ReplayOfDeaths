@@ -27,6 +27,7 @@ import java.util.UUID;
 public class PlayerReplayGui implements Listener {
 
     private static final int PAGE_SIZE = 45;
+    private boolean kills;
 
     private final NamespacedKey replayKey =
             new NamespacedKey(DeathLogging.getInstance(), "history-key");
@@ -46,12 +47,15 @@ public class PlayerReplayGui implements Listener {
         }
     }
 
-    public Inventory getInventory(OfflinePlayer target, int page) {
+    public Inventory getInventory(OfflinePlayer target, int page, boolean kills) {
+        this.kills = kills;
+
+        String field = kills ? "killedId" : "playerId";
 
         List<Document> docs = DeathLogging.getInstance()
                 .getMongoManager()
                 .getReplayCollection()
-                .find(Filters.eq("playerId", target.getUniqueId().toString()))
+                .find(Filters.eq(field, target.getUniqueId().toString()))
                 .sort(Sorts.descending("createdAt"))
                 .into(new ArrayList<>());
 
@@ -60,7 +64,7 @@ public class PlayerReplayGui implements Listener {
 
         Holder holder = new Holder(target.getUniqueId(), page);
         Inventory inventory = Bukkit.createInventory(
-                holder, 54, "§8" + target.getName() + "'s Replays");
+                holder, 54, "§8" + target.getName() + "s Replays");
 
         int start = page * PAGE_SIZE;
         int end = Math.min(start + PAGE_SIZE, docs.size());
@@ -124,9 +128,9 @@ public class PlayerReplayGui implements Listener {
             String name = item.getItemMeta().getDisplayName();
 
             if (name.equals("§ePrevious Page")) {
-                p.openInventory(getInventory(target, holder.page - 1));
+                p.openInventory(getInventory(target, holder.page - 1, kills));
             } else if (name.equals("§eNext Page")) {
-                p.openInventory(getInventory(target, holder.page + 1));
+                p.openInventory(getInventory(target, holder.page + 1, kills));
             }
             return;
         }

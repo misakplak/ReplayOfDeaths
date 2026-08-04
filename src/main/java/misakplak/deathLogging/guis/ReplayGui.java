@@ -17,6 +17,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.SkullMeta;
 
 import java.util.List;
 import java.util.UUID;
@@ -37,9 +39,19 @@ public class ReplayGui implements Listener {
                 .setName("§c§lKills")
                 .build();
 
+         Player target = DeathLogging.getInstance().getReplayTargets().get(player.getUniqueId()).getPlayer();
+
 
         inventory.setItem(2, deaths);
         inventory.setItem(5, kills);
+
+        ItemStack playerhead = new MakeItem(Material.PLAYER_HEAD)
+                .setName(target.getName())
+                .build();
+
+        SkullMeta skullmeta = (SkullMeta) playerhead.getItemMeta();
+        skullmeta.setOwner(target.getName());
+        playerhead.setItemMeta(skullmeta);
 
 
         return inventory;
@@ -69,12 +81,12 @@ public class ReplayGui implements Listener {
 
             case GREEN_DYE -> {
 
-              p.openInventory(gui.getInventory(DeathLogging.getInstance().getReplayTargets().remove(p.getUniqueId()), 0));
+              p.openInventory(gui.getInventory(DeathLogging.getInstance().getReplayTargets().remove(p.getUniqueId()), 0, false));
             }
 
             case RED_DYE -> {
 
-                p.openInventory(gui.getInventory(DeathLogging.getInstance().getReplayTargets().remove(p.getUniqueId()), 0));
+                p.openInventory(gui.getInventory(DeathLogging.getInstance().getReplayTargets().remove(p.getUniqueId()), 0, true));
             }
 
 
