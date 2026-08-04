@@ -3,6 +3,8 @@ package misakplak.deathLogging.guis;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Sorts;
 import misakplak.deathLogging.DeathLogging;
+import misakplak.deathLogging.database.ReplayStorage;
+import misakplak.deathLogging.database.ReplaySummary;
 import misakplak.deathLogging.misc.MakeItem;
 import org.bson.Document;
 import org.bukkit.Bukkit;
@@ -50,43 +52,33 @@ public class PlayerReplayGui implements Listener {
     public Inventory getInventory(OfflinePlayer target, int page, boolean kills) {
         this.kills = kills;
 
-        String field = kills ? "killerId" : "playerId";
+        ReplayStorage storage = DeathLogging.getInstance().getReplayStorage();
 
-        List<Document> docs = DeathLogging.getInstance()
-                .getMongoManager()
-                .getReplayCollection()
-                .find(Filters.eq(field, target.getUniqueId().toString()))
-                .sort(Sorts.descending("createdAt"))
-                .into(new ArrayList<>());
-
-        int totalPages = Math.max(1, (int) Math.ceil(docs.size() / (double) PAGE_SIZE));
+        int total = storage.count(target.getUniqueId(), kills);
+        int totalPages = Math.max(1, (int) Math.ceil(total / (double) PAGE_SIZE));
         page = Math.max(0, Math.min(page, totalPages - 1));
+
+        List<ReplaySummary> summaries = storage.list(target.getUniqueId(), kills, page, PAGE_SIZE);
 
         Holder holder = new Holder(target.getUniqueId(), page);
         Inventory inventory = Bukkit.createInventory(
                 holder, 54, "§8" + target.getName() + "s Replays");
 
-        int start = page * PAGE_SIZE;
-        int end = Math.min(start + PAGE_SIZE, docs.size());
-
         int slot = 0;
-        for (Document doc : docs.subList(start, end)) {
-
-            String replayId = doc.getString("replayId");
-            long createdAt = doc.getLong("createdAt");
+        for (ReplaySummary summary : summaries) {
 
             ItemStack item = new MakeItem(Material.DARK_OAK_SIGN)
                     .setName("§fReplay")
                     .setLoreLegacy(List.of(
                             "§7Replay id:",
-                            "§f§l" + replayId,
+                            "§f§l" + summary.replayId(),
                             "",
-                            "§7" + new Date(createdAt)
+                            "§7" + new Date(summary.createdAt())
                     ))
                     .build();
 
             ItemMeta meta = item.getItemMeta();
-            meta.getPersistentDataContainer().set(replayKey, PersistentDataType.STRING, replayId);
+            meta.getPersistentDataContainer().set(replayKey, PersistentDataType.STRING, summary.replayId().toString());
             item.setItemMeta(meta);
 
             inventory.setItem(slot++, item);

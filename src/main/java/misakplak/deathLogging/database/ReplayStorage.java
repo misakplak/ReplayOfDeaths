@@ -10,4 +10,5 @@ public interface ReplayStorage {
     Replay load(UUID replayId);
     Replay loadLatest();
     List<ReplaySummary> list(UUID playerId, boolean asKiller, int page, int pageSize);
+    int count(UUID playerId, boolean asKiller);
 }

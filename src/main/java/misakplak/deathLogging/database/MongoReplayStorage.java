@@ -44,14 +44,20 @@ public Replay load(UUID replayId) {
 
     @Override
     public List<ReplaySummary> list(UUID playerId, boolean asKiller, int page, int pageSize) {
-        String field = asKiller ? "killerid" : "replayId";
+        String field = asKiller ? "killerId" : "playerId";
         return collection.find(Filters.eq(field, playerId.toString()))
                 .sort(Sorts.descending("createdAt"))
                 .skip(page * pageSize)
                 .limit(pageSize)
                 .into(new ArrayList<Document>())
                 .stream()
-                .map(d -> new ReplaySummary(UUID.fromString(d.getString("replayId ")), d.getLong("createdAt")))
+                .map(d -> new ReplaySummary(UUID.fromString(d.getString("replayId")), d.getLong("createdAt")))
                 .toList();
+    }
+
+    @Override
+    public int count(UUID playerId, boolean asKiller) {
+        String field = asKiller ? "killerId" : "playerId";
+        return (int) collection.countDocuments(Filters.eq(field, playerId.toString()));
     }
 }

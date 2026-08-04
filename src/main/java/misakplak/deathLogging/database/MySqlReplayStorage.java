@@ -130,5 +130,24 @@ public class MySqlReplayStorage implements ReplayStorage {
             DeathLogging.getInstance().getLogger().warning("Failed to create replays table: " + e.getMessage());
         }
     }
+
+    @Override
+    public int count(UUID playerId, boolean asKiller) {
+        String column = asKiller ? "killer_id" : "player_id";
+        String sql = "SELECT COUNT(*) FROM replays WHERE " + column + " = ?";
+
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, playerId.toString());
+            try (ResultSet rs = stmt.executeQuery()) {
+                return rs.next() ? rs.getInt(1) : 0;
+            }
+
+        } catch (SQLException e) {
+            DeathLogging.getInstance().getLogger().warning("Failed to count replays: " + e.getMessage());
+            return 0;
+        }
+    }
 }
 
