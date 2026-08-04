@@ -18,6 +18,8 @@ dependencies {
     paperweight.paperDevBundle("1.21.11-R0.1-SNAPSHOT")
     implementation("org.mongodb:mongodb-driver-sync:5.6.0")
     compileOnly("org.mongodb:bson:3.4.3")
+    implementation("com.mysql:mysql-connector-j:9.4.0")
+    implementation("com.zaxxer:HikariCP:6.3.0")
 }
 
 java {

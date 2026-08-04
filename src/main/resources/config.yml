@@ -20,4 +20,12 @@ database:
     database: deathloggingMC
 
 
+  mysql:
+    host: localhost
+    port: 3306
+    database: deathloggingMC
+    username: root
+    password: ""
+
+
 

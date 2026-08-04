@@ -1,6 +1,6 @@
 package misakplak.deathLogging.replay.loading;
 
-import misakplak.deathLogging.database.ReplayStorage;
+import misakplak.deathLogging.database.MongoReplayStorage;
 import misakplak.deathLogging.replay.Replay;
 import misakplak.deathLogging.replay.world.PlotCopier;
 import misakplak.deathLogging.replay.world.PlotRollback;
@@ -15,13 +15,13 @@ import java.util.UUID;
 public class ReplayManaging {
 
     private final Map<UUID, ReplaySession> sessions = new HashMap<>();
-    private final ReplayStorage storage;
+    private final MongoReplayStorage storage;
 
     private final ReplayWorldManager replayWorldManager;
     private final PlotCopier plotCopier;
     private final PlotRollback plotRollback = new PlotRollback();
 
-    public ReplayManaging(ReplayStorage storage, ReplayWorldManager replayWorldManager){
+    public ReplayManaging(MongoReplayStorage storage, ReplayWorldManager replayWorldManager){
         this.storage = storage;
         this.replayWorldManager = replayWorldManager;
         this.plotCopier = new PlotCopier();

@@ -1,13 +1,7 @@
 package misakplak.deathLogging.guis;
 
-import com.mongodb.client.MongoDatabase;
 import misakplak.deathLogging.DeathLogging;
-import misakplak.deathLogging.database.MongoManager;
-import misakplak.deathLogging.database.ReplayStorage;
 import misakplak.deathLogging.misc.MakeItem;
-import misakplak.deathLogging.replay.Replay;
-import misakplak.deathLogging.replay.loading.ReplayManaging;
-import misakplak.deathLogging.replay.world.ReplayWorldManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
@@ -17,11 +11,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
-
-import java.util.List;
-import java.util.UUID;
 
 public class ReplayGui implements Listener {
 

@@ -8,11 +8,6 @@ public class TickTracker {
     private static long tick;
 
 
-    public static void start(){
-        Bukkit.getScheduler().runTaskTimer(DeathLogging.getInstance(), () -> tick++, 1L, 1L);
-    }
-
-
     public static long getTick(){
         return  tick;
     }

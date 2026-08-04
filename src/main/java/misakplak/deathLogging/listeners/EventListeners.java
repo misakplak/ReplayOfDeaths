@@ -1,14 +1,11 @@
 package misakplak.deathLogging.listeners;
 
-import io.papermc.paper.event.player.PlayerPickItemEvent;
 import misakplak.deathLogging.DeathLogging;
-import misakplak.deathLogging.database.ReplayStorage;
+import misakplak.deathLogging.database.MongoReplayStorage;
 import misakplak.deathLogging.misc.SwingHand;
 import misakplak.deathLogging.recordables.*;
 import misakplak.deathLogging.replay.*;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -17,7 +14,6 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.*;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
 
@@ -25,7 +21,7 @@ public class EventListeners implements Listener {
 
     private final ReplayManager manager;
     private final LocationRecorder locationRecorder = new LocationRecorder();
-    private final ReplayStorage replayStorage = DeathLogging.getInstance().getReplayStorage();
+    private final MongoReplayStorage replayStorage = DeathLogging.getInstance().getReplayStorage();
 
 
     public EventListeners(ReplayManager manager) {
