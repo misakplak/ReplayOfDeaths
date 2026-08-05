@@ -8,7 +8,7 @@ world:
 
 
   plot:
-    plot-spacing: 40 #the space to reserve between each plot
+    plot-spacing: 40 #the space to set between each plot
 
 
 database:
