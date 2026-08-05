@@ -103,6 +103,14 @@ public class ReplayCodec {
                         .append("tick", tick    )
                         .append("swing", swingArmRecord.hand().name()));
             }
+
+            if (record instanceof HotbarItemChangeRecord hotbarItemChangeRecord) {
+                records.add(new Document()
+                        .append("type", "ITEM_CHANGE")
+                        .append("tick", tick)
+                        .append("material", hotbarItemChangeRecord.material().name())
+                );
+            }
         }
 
         return new Document()
@@ -187,6 +195,11 @@ public class ReplayCodec {
                 case "ENTITY_REMOVE" -> records.add(new EntityRemoveRecord(
                         getLong(record, "tick"),
                         UUID.fromString(record.getString("uuid"))
+                ));
+
+                case "ITEM_CHANGE" -> records.add(new HotbarItemChangeRecord(
+                        getLong(record, "tick"),
+                        Material.getMaterial(record.getString("material"))
                 ));
             }
         }

@@ -21,9 +21,11 @@ import net.minecraft.world.entity.PositionMoveRotation;
 import net.minecraft.world.entity.Relative;
 import net.minecraft.world.item.ItemStack;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
+import org.bukkit.craftbukkit.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
 
 import java.util.List;
@@ -226,6 +228,24 @@ public class ReplayNPC {
                         )
                 )
         );
+    }
+
+    public void changeItem(Player viewer, Material material) {
+        ServerPlayer conection = ((CraftPlayer) viewer).getHandle();
+
+
+        org.bukkit.inventory.ItemStack item = new org.bukkit.inventory.ItemStack(material);
+
+        net.minecraft.world.item.ItemStack nmsItem = CraftItemStack.asNMSCopy(item);
+
+        ClientboundSetEquipmentPacket packet = new ClientboundSetEquipmentPacket(
+                npc.getId(),
+                List.of(
+                        new Pair<>(EquipmentSlot.MAINHAND, nmsItem)
+                )
+        );
+
+        conection.connection.send(packet);
     }
 
 

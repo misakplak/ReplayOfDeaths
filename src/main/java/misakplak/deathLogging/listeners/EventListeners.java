@@ -1,5 +1,6 @@
 package misakplak.deathLogging.listeners;
 
+import io.papermc.paper.event.player.PlayerInventorySlotChangeEvent;
 import misakplak.deathLogging.DeathLogging;
 import misakplak.deathLogging.database.MongoReplayStorage;
 import misakplak.deathLogging.database.ReplayStorage;
@@ -250,6 +251,29 @@ public class EventListeners implements Listener {
         }
 
         buffer.add(new SwingArmRecord(TickTracker.getTick(), SwingHand.MAIN));
+    }
+
+    @EventHandler
+    public void onItemChange(PlayerInventorySlotChangeEvent event) {
+
+        Player player = event.getPlayer();
+
+        ReplayBuffer buffer = manager.get(player);
+
+        if (buffer == null) {
+            return;
+        }
+
+        if (!(event.getSlot() >= 36 && event.getSlot() <= 44)) {
+            return;
+        }
+
+        Material material = event.getNewItemStack().getType();
+
+        buffer.add(new HotbarItemChangeRecord(
+                TickTracker.getTick(),
+                material
+        ));
     }
 
 

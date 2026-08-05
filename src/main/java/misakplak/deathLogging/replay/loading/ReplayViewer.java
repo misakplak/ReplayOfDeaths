@@ -7,11 +7,15 @@ import misakplak.deathLogging.replay.LocationRecorder;
 import misakplak.deathLogging.replay.Replay;
 import misakplak.deathLogging.replay.ReplayNPC;
 import misakplak.deathLogging.replay.world.ReplayOffset;
+import net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket;
+import net.minecraft.network.protocol.game.ClientboundSetHeldSlotPacket;
 import net.minecraft.server.level.ServerPlayer;
 import org.bukkit.*;
+import org.bukkit.craftbukkit.inventory.CraftItemStack;
 import org.bukkit.entity.*;
 import org.bukkit.event.entity.EntityDropItemEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
 
@@ -161,6 +165,9 @@ public class ReplayViewer {
             case PickupItemRecord pickup ->
                 pickupEfect(pickup);
 
+            case HotbarItemChangeRecord change ->
+                changeItem(change);
+
 
 
             /* TODO: /*
@@ -296,6 +303,11 @@ public class ReplayViewer {
     public void pickupEfect(PickupItemRecord record) {
         Location location = toReplayLocation(record.position());
         location.getWorld().playSound(location, Sound.ENTITY_ITEM_PICKUP, 1, 1);
+    }
+
+    public void changeItem(HotbarItemChangeRecord record) {
+        Material material = record.material();
+        npc.changeItem(viewer, material);
     }
 
 }

@@ -29,7 +29,7 @@ public class ReplayGui implements Listener {
                 .build();
 
         inventory.setItem(2, deaths);
-        inventory.setItem(5, kills);
+        inventory.setItem(6, kills);
 
         OfflinePlayer target = DeathLogging.getInstance().getReplayTargets().get(player.getUniqueId());
 
@@ -40,6 +40,8 @@ public class ReplayGui implements Listener {
         SkullMeta skullmeta = (SkullMeta) playerhead.getItemMeta();
         skullmeta.setOwner(target.getName());
         playerhead.setItemMeta(skullmeta);
+
+        inventory.setItem(4, playerhead);
 
 
         return inventory;
