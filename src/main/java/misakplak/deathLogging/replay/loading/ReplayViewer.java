@@ -9,10 +9,7 @@ import misakplak.deathLogging.replay.ReplayNPC;
 import misakplak.deathLogging.replay.world.ReplayOffset;
 import net.minecraft.server.level.ServerPlayer;
 import org.bukkit.*;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Item;
-import org.bukkit.entity.Mob;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.*;
 import org.bukkit.event.entity.EntityDropItemEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitTask;
@@ -98,6 +95,9 @@ public class ReplayViewer {
 
         ghostItems.forEach(Item::remove);
         ghostItems.clear();
+
+        playerGhosts.values().forEach(ghost -> ghost.destroy(viewer));
+        playerGhosts.clear();
 
         if (onEnd != null) onEnd.run();
     }
@@ -188,7 +188,15 @@ public class ReplayViewer {
         return offset.apply(Position.toLocation(position, plotOrigin.getWorld()));
     }
 
+    private final Map<UUID, ReplayNPC> playerGhosts = new HashMap<>();
+
     private void spawnEntity(EntitySpawnRecord record) {
+
+        if (record.getEntityType() ==  EntityType.PLAYER) {
+        spawnPlayerGhost(record);
+        return;
+        }
+
         if (!record.entityType().isSpawnable()) return;
 
         Location location = toReplayLocation(record.position());
@@ -202,7 +210,28 @@ public class ReplayViewer {
         entities.put(record.entityId(), entity);
     }
 
+    private void spawnPlayerGhost(EntitySpawnRecord record) {
+        Location location = toReplayLocation(record.position());
+
+        String name = Bukkit.getOfflinePlayer(record.entityId()).getName();
+        if (name == null) name = "Player";
+
+        ReplayNPC ghost = new ReplayNPC(location, name);
+
+        ghost.spawn(viewer);
+
+        playerGhosts.put(record.entityId(), ghost);
+    }
+
     private void moveEntity(EntityMoveRecord record) {
+
+        ReplayNPC ghost = playerGhosts.get(record.entityId());
+        if (ghost != null) {
+            ghost.teleport(viewer, toReplayLocation(record.position()));
+            return;
+        }
+
+
 
         Entity entity = entities.get(record.entityId());
 
@@ -214,6 +243,14 @@ public class ReplayViewer {
     }
 
     public void removeEntity(EntityRemoveRecord record) {
+
+        ReplayNPC ghost = playerGhosts.remove(record.entityId());
+
+        if (ghost != null) {
+            ghost.destroy(viewer);
+            return;
+        }
+
 
         Entity entity = entities.remove(record.entityId());
 

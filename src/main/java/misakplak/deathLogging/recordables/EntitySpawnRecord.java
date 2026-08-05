@@ -10,4 +10,8 @@ public record EntitySpawnRecord(
         EntityType entityType,
         Position position
 )implements Recordable {
+
+    public EntityType getEntityType() {
+        return entityType;
+    }
 }
