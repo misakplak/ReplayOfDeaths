@@ -25,7 +25,7 @@ public class ReplayManaging {
     public ReplayManaging(ReplayStorage storage, ReplayWorldManager replayWorldManager){
         this.storage = storage;
         this.replayWorldManager = replayWorldManager;
-        this.plotCopier = new PlotCopier();
+        this.plotCopier = new PlotCopier(replayWorldManager.getPlotManager().getHalfPlotSize());
     }
 
     public void play(Player player, UUID replayId){

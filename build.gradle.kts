@@ -1,3 +1,5 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+
 plugins {
     id("java-library")
     id("xyz.jpenilla.run-paper") version "3.0.2"
@@ -40,5 +42,10 @@ tasks {
         filesMatching("plugin.yml") {
             expand(props)
         }
+    }
+
+    named<ShadowJar>("shadowJar") {
+        archiveFileName.set("DeathLogging.jar")
+            destinationDirectory.set(file("C:\\Users/misak/Downloads/TestServer/plugins"))
     }
 }

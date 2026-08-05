@@ -6,7 +6,11 @@ import org.bukkit.block.Block;
 
 public class PlotCopier {
 
-    private static final int RADIUS = 50;
+    private final int radius;
+
+    public PlotCopier(int radius) {
+        this.radius = radius;
+    }
 
     public void copy(Location sourceCenter, Location plotOrigin) {
 
@@ -15,8 +19,8 @@ public class PlotCopier {
 
         ReplayOffset offset = ReplayOffset.between(sourceCenter, plotOrigin);
 
-        for (int x = -RADIUS; x <= RADIUS; x++) {
-            for (int z = -RADIUS; z <= RADIUS; z++) {
+        for (int x = -radius; x <= radius; x++) {
+            for (int z = -radius; z <= radius; z++) {
                 for (int y = source.getMinHeight(); y < source.getMaxHeight(); y++) {
                     Block sourceBlock = source.getBlockAt(
                             sourceCenter.getBlockX() + x, y, sourceCenter.getBlockZ() + z);

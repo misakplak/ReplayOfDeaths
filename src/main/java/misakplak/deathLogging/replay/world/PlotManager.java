@@ -90,4 +90,8 @@ public class PlotManager {
             DeathLogging.getInstance().getLogger().log(Level.WARNING, "Failed to save plots.yml", e);
         }
     }
+
+    public int getHalfPlotSize() {
+        return halfPlotSize;
+    }
 }
