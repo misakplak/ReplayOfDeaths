@@ -34,7 +34,7 @@ public class EntityRecorder {
 
             Position position = new Position(
                     entity.getX(), entity.getY(), entity.getZ(),
-                    entity.getYaw(), entity.getPitch()
+                    entity.getYaw(), entity.getPitch(), entity.getWorld().getName()
             );
 
             if (!buffer.isTracking(entity)) {

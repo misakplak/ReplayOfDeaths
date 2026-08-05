@@ -15,7 +15,8 @@ public class LocationRecorder {
                         player.getY(),
                         player.getZ(),
                         player.getYaw(),
-                        player.getPitch()
+                        player.getPitch(),
+                        player.getWorld().getName()
                 )
         );
     }

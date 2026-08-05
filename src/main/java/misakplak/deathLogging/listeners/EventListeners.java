@@ -60,7 +60,8 @@ public class EventListeners implements Listener {
                 event.getPlayer().getY(),
                 event.getPlayer().getZ(),
                 event.getPlayer().getPitch(),
-                event.getPlayer().getYaw()
+                event.getPlayer().getYaw(),
+                event.getPlayer().getWorld().getName()
         );
 
 
@@ -97,7 +98,8 @@ public class EventListeners implements Listener {
                 event.getBlock().getY(),
                 event.getBlock().getZ(),
                 0f,
-                0f
+                0f,
+                event.getPlayer().getWorld().getName()
         );
         long tick = TickTracker.getTick();
 
@@ -121,7 +123,8 @@ public class EventListeners implements Listener {
                 event.getBlock().getY(),
                 event.getBlock().getZ(),
                 0f,
-                0f
+                0f,
+                event.getBlock().getWorld().getName()
         );
 
         if (buffer == null) {
@@ -154,7 +157,8 @@ public class EventListeners implements Listener {
                 event.getEntity().getY(),
                 event.getEntity().getZ(),
                 event.getEntity().getYaw(),
-                event.getEntity().getPitch()
+                event.getEntity().getPitch(),
+                event.getEntity().getWorld().getName()
         );
 
 
@@ -187,7 +191,8 @@ public class EventListeners implements Listener {
                 event.getItemDrop().getY(),
                 event.getItemDrop().getZ(),
                 event.getItemDrop().getYaw(),
-                event.getItemDrop().getPitch()
+                event.getItemDrop().getPitch(),
+                event.getItemDrop().getWorld().getName()
         );
 
         Material material = event.getItemDrop().getItemStack().getType();
@@ -214,7 +219,8 @@ public class EventListeners implements Listener {
                 event.getPlayer().getY(),
                 event.getPlayer().getZ(),
                 event.getPlayer().getYaw(),
-                event.getPlayer().getPitch()
+                event.getPlayer().getPitch(),
+                event.getPlayer().getWorld().getName()
         );
 
         if (buffer == null) {

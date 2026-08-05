@@ -27,6 +27,6 @@ public record Replay(
     }
 
     public Location getDeathlocation() {
-        return Position.toLocation(deathlocation, Bukkit.getWorld("world"));
+        return Position.toLocation(deathlocation);
     }
 }

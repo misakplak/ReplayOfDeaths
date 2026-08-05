@@ -200,7 +200,8 @@ public class ReplayCodec {
                 .append("y", p.y())
                 .append("z", p.z())
                 .append("yaw", p.yaw())
-                .append("pitch", p.pitch());
+                .append("pitch", p.pitch())
+                .append("world", p.world());
     }
 
     private Position position(Document document) {
@@ -209,7 +210,8 @@ public class ReplayCodec {
                 document.getDouble("y"),
                 document.getDouble("z"),
                 document.getDouble("yaw").floatValue(),
-                document.getDouble("pitch").floatValue()
+                document.getDouble("pitch").floatValue(),
+                document.getString("world")
         );
     }
 
