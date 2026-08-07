@@ -7,6 +7,7 @@ import misakplak.deathLogging.database.ReplayStorage;
 import misakplak.deathLogging.misc.SwingHand;
 import misakplak.deathLogging.recordables.*;
 import misakplak.deathLogging.replay.*;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -16,6 +17,7 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.*;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.UUID;
 
@@ -49,39 +51,42 @@ public class EventListeners implements Listener {
     @EventHandler
     public void onDeath(PlayerDeathEvent event) {
 
-        ReplayBuffer buffer = manager.getOrCreate(event.getPlayer());
 
 
-        if (buffer == null) {
-            return;
-        }
-
-        Position position = new Position(
-                event.getPlayer().getX(),
-                event.getPlayer().getY(),
-                event.getPlayer().getZ(),
-                event.getPlayer().getPitch(),
-                event.getPlayer().getYaw(),
-                event.getPlayer().getWorld().getName()
-        );
+            ReplayBuffer buffer = manager.getOrCreate(event.getPlayer());
 
 
-        Replay replay = new Replay(
-                UUID.randomUUID(),
-                event.getPlayer().getUniqueId(),
-                position,
-                event.getPlayer().getKiller() == null
-                        ? null
-                        : event.getPlayer().getKiller().getUniqueId(),
-                System.currentTimeMillis(),
-                buffer.getRecords()
-        );
+            if (buffer == null) {
+                return;
+            }
+
+            Position position = new Position(
+                    event.getPlayer().getX(),
+                    event.getPlayer().getY(),
+                    event.getPlayer().getZ(),
+                    event.getPlayer().getPitch(),
+                    event.getPlayer().getYaw(),
+                    event.getPlayer().getWorld().getName()
+            );
 
 
-        replayStorage.save(replay);
+            Replay replay = new Replay(
+                    UUID.randomUUID(),
+                    event.getPlayer().getUniqueId(),
+                    position,
+                    event.getPlayer().getKiller() == null
+                            ? null
+                            : event.getPlayer().getKiller().getUniqueId(),
+                    System.currentTimeMillis(),
+                    buffer.getRecords()
+            );
 
-        manager.remove(event.getPlayer());
-        manager.create(event.getPlayer());
+        Bukkit.getScheduler().runTaskAsynchronously(DeathLogging.getInstance(), () ->
+                replayStorage.save(replay));
+
+            manager.remove(event.getPlayer());
+            manager.create(event.getPlayer());
+
     }
 
 
@@ -257,24 +262,29 @@ public class EventListeners implements Listener {
     public void onItemChange(PlayerInventorySlotChangeEvent event) {
 
         Player player = event.getPlayer();
-
         ReplayBuffer buffer = manager.get(player);
+        if (buffer == null) return;
 
-        if (buffer == null) {
-            return;
-        }
-
-        if (!(event.getSlot() >= 36 && event.getSlot() <= 44)) {
+        if (event.getSlot() != player.getInventory().getHeldItemSlot()) {
             return;
         }
 
         Material material = event.getNewItemStack().getType();
 
-        buffer.add(new HotbarItemChangeRecord(
-                TickTracker.getTick(),
-                material
-        ));
+        buffer.add(new HotbarItemChangeRecord(TickTracker.getTick(), material));
     }
 
+    @EventHandler
+    public void onHeldSlotChange(PlayerItemHeldEvent event) {
+
+        Player player = event.getPlayer();
+        ReplayBuffer buffer = manager.get(player);
+        if (buffer == null) return;
+
+        ItemStack newItem = player.getInventory().getItem(event.getNewSlot());
+        Material material = newItem == null ? Material.AIR : newItem.getType();
+
+        buffer.add(new HotbarItemChangeRecord(TickTracker.getTick(), material));
+    }
 
 }

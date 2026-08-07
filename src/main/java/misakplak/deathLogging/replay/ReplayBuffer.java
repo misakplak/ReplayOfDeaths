@@ -1,5 +1,6 @@
 package misakplak.deathLogging.replay;
 
+import misakplak.deathLogging.DeathLogging;
 import misakplak.deathLogging.recordables.EntitySpawnRecord;
 import misakplak.deathLogging.recordables.Position;
 import misakplak.deathLogging.recordables.Recordable;
@@ -21,7 +22,8 @@ public class ReplayBuffer {
     public void add(Recordable record) {
         records.add(record);
 
-        long oldestAllowedTick = record.tick() - 300;
+        int duration = DeathLogging.getInstance().getConfig().getInt("log.log-duration", 300);
+        long oldestAllowedTick = record.tick() - duration;
 
         Iterator<Recordable> iterator = records.iterator();
         while (iterator.hasNext()) {

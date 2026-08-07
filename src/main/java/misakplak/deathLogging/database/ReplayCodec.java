@@ -1,5 +1,6 @@
 package misakplak.deathLogging.database;
 
+import misakplak.deathLogging.DeathLogging;
 import misakplak.deathLogging.misc.SwingHand;
 import misakplak.deathLogging.recordables.*;
 import misakplak.deathLogging.replay.Replay;
@@ -18,8 +19,9 @@ public class ReplayCodec {
 
         List<Document> records = new ArrayList<>();
 
+        int duration = DeathLogging.getInstance().getConfig().getInt("log.log-duration", 300);
         long lastTick = replay.records().getLast().tick();
-        long firstTick = lastTick - 300;
+        long firstTick = lastTick - duration;
 
         for (Recordable record : replay.records()) {
 

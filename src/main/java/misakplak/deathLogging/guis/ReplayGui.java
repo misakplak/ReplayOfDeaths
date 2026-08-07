@@ -70,12 +70,21 @@ public class ReplayGui implements Listener {
         switch (item.getType()) {
 
             case GREEN_DYE ->
-                    p.openInventory(gui.getInventory(DeathLogging.getInstance().getReplayTargets().get(p.getUniqueId()), 0, false));
+                    Bukkit.getScheduler().runTaskAsynchronously(DeathLogging.getInstance(), () -> {
+                        Inventory inventory = gui.getInventory(DeathLogging.getInstance().getReplayTargets().get(p.getUniqueId()), 0, false);
+                        Bukkit.getScheduler().runTask(DeathLogging.getInstance(), () -> {
+                            p.openInventory(inventory);
+                        });
+
+                    });
 
             case RED_DYE ->
-                    p.openInventory(gui.getInventory(DeathLogging.getInstance().getReplayTargets().get(p.getUniqueId()), 0, true));
-
-
+                    Bukkit.getScheduler().runTaskAsynchronously(DeathLogging.getInstance(), () -> {
+                        Inventory inventory = gui.getInventory(DeathLogging.getInstance().getReplayTargets().get(p.getUniqueId()), 0, true);
+                        Bukkit.getScheduler().runTask(DeathLogging.getInstance(), () -> {
+                            p.openInventory(inventory);
+                        });
+                    });
         }
     }
 }

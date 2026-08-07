@@ -1,17 +1,17 @@
 package misakplak.deathLogging.replay.loading;
 
+import misakplak.deathLogging.DeathLogging;
 import misakplak.deathLogging.database.MongoReplayStorage;
 import misakplak.deathLogging.database.ReplayStorage;
 import misakplak.deathLogging.replay.Replay;
 import misakplak.deathLogging.replay.world.PlotCopier;
 import misakplak.deathLogging.replay.world.PlotRollback;
 import misakplak.deathLogging.replay.world.ReplayWorldManager;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class ReplayManaging {
 
@@ -28,9 +28,13 @@ public class ReplayManaging {
         this.plotCopier = new PlotCopier(replayWorldManager.getPlotManager().getHalfPlotSize());
     }
 
+    private final Set<UUID> activeReplayIds = new HashSet<>();
+
     public void play(Player player, UUID replayId){
 
         stop(player);
+
+        Bukkit.getScheduler().runTaskAsynchronously(DeathLogging.getInstance(), () -> {
 
         Replay replay = storage.load(replayId);
 
@@ -43,16 +47,20 @@ public class ReplayManaging {
                 .getPlotManager()
                 .getPlot(replayWorldManager.getWorld(), replay.getReplayId());
 
+        activeReplayIds.add(replayId);
+
         plotCopier.copy(replay.getDeathlocation(), plot);
         plotRollback.rollback(replay, plot);
 
 
-        ReplaySession session = new ReplaySession(player, replay, plot,
-                () -> sessions.remove(player.getUniqueId())
-                );
+            ReplaySession session = new ReplaySession(player, replay, plot, () -> {
+                sessions.remove(player.getUniqueId());
+                activeReplayIds.remove(replayId);
+            });
 
         sessions.put(player.getUniqueId(), session);
         session.start();
+        });
     }
 
     public void stop(Player player){

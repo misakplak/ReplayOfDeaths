@@ -93,14 +93,25 @@ public class ReplayViewer {
 
         if (task != null) task.cancel();
 
-        npc.destroy(viewer);
+        try {
+            npc.destroy(viewer);
+        } catch (Exception ignored) {
+        }
+
         entities.values().forEach(Entity::remove);
+
         entities.clear();
 
         ghostItems.forEach(Item::remove);
+
         ghostItems.clear();
 
-        playerGhosts.values().forEach(ghost -> ghost.destroy(viewer));
+        for (ReplayNPC ghost : playerGhosts.values()) {
+            try {
+                ghost.destroy(viewer);
+            } catch (Exception ignored) {
+            }
+        }
         playerGhosts.clear();
 
         if (onEnd != null) onEnd.run();
